@@ -22,7 +22,7 @@ import statsmodels.api as sm
 import econtools
 import econtools.metrics as mt
 #Para Regressão em Painel
-from linearmodels import PanelOLS, FirstDifferenceOLS
+from linearmodels import PanelOLS, FirstDifferenceOLS, PooledOLS, RandomEffects
 
 #Pacotes para gráficos (caso precise)
 import matplotlib
@@ -49,23 +49,38 @@ def coletar_dados(nome = ""):
     #Pegando qual a pasta do arquivo que está sendo usado pra programar
     caminho = pathlib.Path().absolute()
 
+    #No meu caso específico:
+    caminho_vinicius = f"{caminho}/datasets"
+
     #checando se o nome foi inserido ou não; caso não, pegar o arquivo .dta mais recente
     if nome == "":
-        arquivo = max(glob.glob(f"{str(caminho)}/*.dta"), key=os.path.getctime)
-        df = pd.read_stata(arquivo)
-        print(f"{arquivo}.dta foi lido com sucesso!")
-        return df
+        try:
+            arquivo = max(glob.glob(f"{str(caminho)}/*.dta"), key=os.path.getctime)
+            df = pd.read_stata(arquivo)
+            print(f"{arquivo}.dta foi lido com sucesso!")
+            return df
+        except:
+            arquivo = max(glob.glob(f"{str(caminho_vinicius)}/*.dta"), key=os.path.getctime)
+            df = pd.read_stata(arquivo)
+            print(f"{arquivo}.dta foi lido com sucesso!")
+            return df
     else:
         try:
             arquivo = f"{str(caminho)}/{str(nome)}.dta"
             df = pd.read_stata(arquivo)
             print(f"{nome}.dta foi lido com sucesso!")
             return df
-        except: #caso não tenha sido encontrado o arquivo com o nome inserido
-            print('''
-            Não foi possível achar o arquivo :(\n
-            Verifique se seu nome está correto (sem a extensão) e se ele está no mesmo diretório do programa!
-            ''')
+        except:
+            try:
+                arquivo = f"{str(caminho_vinicius)}/{str(nome)}.dta"
+                df = pd.read_stata(arquivo)
+                print(f"{nome}.dta foi lido com sucesso!")
+                return df
+            except: #caso não tenha sido encontrado o arquivo com o nome inserido
+                print('''
+                Não foi possível achar o arquivo :(\n
+                Verifique se seu nome está correto (sem a extensão) e se ele está no mesmo diretório do programa!
+                ''')
 
 def Regressão_Simples(Lista_x, Lista_y):
     '''
@@ -546,7 +561,7 @@ def Arrumar_Painel():
     df[coluna_tempo] = periodos
     return df
 
-def Reg_Primeiras_Diferenças (x,y, robusta = "N"):
+def Reg_Painel_Primeiras_Diferenças (x,y, robusta = "N"):
     '''
     Função que calcula uma regressão de primeiras diferenças SEM um intercepto, sendo, por default, computada com erros padrões não robustos.
     Para calcular a regressão com um intercepto, ver o notebook "Cap 13 e 14".
@@ -560,7 +575,7 @@ def Reg_Primeiras_Diferenças (x,y, robusta = "N"):
     Resultado = Modelo.fit()
     print(Resultado)
 
-def Regressão_Efeitos_Fixos(x, y, constante = "S", robusta = "N"):
+def Reg_Painel_Efeitos_Fixos(x, y, constante = "S", robusta = "N"):
     '''
     Função que calcula uma regressão de efeitos fixos, sendo, por default, computada com um intercepto e com erros padrões não robustos.
     **IMPORTANTE: para o painel estar arrumado, os dados devem estar multi-indexados por indíviduo e por tempo, nesta ordem.
@@ -584,4 +599,53 @@ def Regressão_Efeitos_Fixos(x, y, constante = "S", robusta = "N"):
         Resultado = Modelo.fit()
     else:
         Resultado = Modelo.fit(cov_type = 'robust')
+    print(Resultado)
+
+def Reg_Painel_MQO_Agrupado(x, y, constante = "S", robusta = "S"):
+    '''
+    Função que calcula uma regressão por MQO agrupado, sendo, por default, computada com um intercepto e com erros padrões  robustos.
+    **IMPORTANTE: para o painel estar arrumado, os dados devem estar multi-indexados por indíviduo e por tempo, nesta ordem.
+    Caso contrário, transformar o dataframe usando a função 'Arrumar Painel'
+    x: lista ou array com os valores das variáveis independentes;
+    y: lista ou array com os valores da variável dependente;
+    constante: "S" para regressão com intercepto e qualquer outro valor para sem intercepto. Caso em branco, a regressão é computada com intercepto;
+    robusta: "N" para regressão com erros-padrão tradicionais e qualquer outro valor para erros-padrões robustos. Caso em branco, a regressão é computada com erros-padrão robustos.
+    '''
+    global df, Resultado
+    
+    # formando o vetor de variáveis independentes
+    if constante == "S":
+        X = sm.add_constant(x)
+    else:
+        X = x
+    
+    #Criando o Modelo levando em conta a opção de ser uma regressão robusta p/ heteroscedasticidade ou não
+    Modelo = PooledOLS(y,X)
+    if robusta == "N":
+        Resultado = Modelo.fit()
+    else:
+        Resultado = Modelo.fit(cov_type = 'robust')
+    print(Resultado)
+
+def Reg_Painel_Efeitos_Aleatórios(x, y, constante = "S"):
+    '''
+    Função que calcula uma regressão de efeitos fixos, sendo, por default, computada com um intercepto e com erros padrões  robustos.
+    **IMPORTANTE: para o painel estar arrumado, os dados devem estar multi-indexados por indíviduo e por tempo, nesta ordem.
+    Caso contrário, transformar o dataframe usando a função 'Arrumar Painel'
+    x: lista ou array com os valores das variáveis independentes;
+    y: lista ou array com os valores da variável dependente;
+    constante: "S" para regressão com intercepto e qualquer outro valor para sem intercepto. Caso em branco, a regressão é computada com intercepto;
+    robusta: "N" para regressão com erros-padrão tradicionais e qualquer outro valor para erros-padrões robustos. Caso em branco, a regressão é computada com erros-padrão robustos.
+    '''
+    global df, Resultado
+    
+    # formando o vetor de variáveis independentes
+    if constante == "S":
+        X = sm.add_constant(x)
+    else:
+        X = x
+    
+    #Criando o Modelo
+    Modelo = RandomEffects(y,X)
+    Resultado = Modelo.fit()
     print(Resultado)

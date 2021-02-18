@@ -1,4 +1,5 @@
 #Criado por: Vinícius de Almeida Nery Ferreira (ECO - UnB)
+#Github: https://github.com/vnery5/Econometria
 
 #######################################################################################################################
 ###COMO USAR AS FUNÇÕES EM UM NOTEBOOK
@@ -28,6 +29,8 @@ from linearmodels import PanelOLS, FirstDifferenceOLS, PooledOLS, RandomEffects
 import matplotlib
 import matplotlib.pyplot as plt
 import seaborn as sns
+import plotly.express as px
+import plotly.graph_objects as go
 
 #Pacotes para fazer a coleta dos dados armazenados no mesmo diretório e outros pacotes gerais
 import os
@@ -82,73 +85,7 @@ def coletar_dados(nome = ""):
                 Verifique se seu nome está correto (sem a extensão) e se ele está no mesmo diretório do programa!
                 ''')
 
-def Regressão_Simples(Lista_x, Lista_y):
-    '''
-    Função que calcula as estatísticas de uma regressão simples
-
-    Lista_x: lista com os valores de x;
-    Lista_y: lista com os valores de y;
-    '''
-
-    global Lista_ychapeu_simples, Resíduos_simples
-    
-    #calculando o número de observações e as médias
-    Número_de_Observações = len(Lista_x)
-    Média_x = sum(Lista_x)/Número_de_Observações
-    Média_y = sum(Lista_y)/Número_de_Observações
-
-    #Calculando os coeficientes do modelo
-    B1, B0, R, valor_P, DP = stats.linregress(Lista_x, Lista_y)
-    #Gerando os valores previstos
-    Lista_ychapeu_simples = [round(B0 + B1 * i,3) for i in Lista_x]
-    #Calculando os Resíduos
-    Resíduos_simples = [(j - k) for j,k in zip(Lista_y, Lista_ychapeu_simples)]
-    
-    #Calculando R-quadrados e a Soma dos Quadrados das Variáveis
-    R_quadrado = round(R**2,5)
-    SQTx = sum([(i - Média_x)**2 for i in Lista_x])
-    SQTy = sum([(i - Média_y)**2 for i in Lista_y])
-    SQEy = sum([(i - Média_y)**2 for i in Lista_ychapeu_simples])
-    SQR = sum([i**2 for i in Resíduos_simples]) 
-
-    #Calculando a Variância da Regressão e dos  Coeficientes
-    VarianciaReg = SQR/(Número_de_Observações - 2)
-    EPR = math.sqrt(VarianciaReg)
-    VarB1 = VarianciaReg/SQTx
-    VarB0 = (VarianciaReg * sum([i**2 for i in Lista_x]))/(Número_de_Observações * SQTx)
-    
-    #Calculando da estatistica t com intervalo de confiança de 95%  (p/ gerar os intervalos de confiança dos estimadores)
-    Estatistica_t_Critica = stats.t.ppf(0.95, Número_de_Observações - 2)
-
-    #Calculando os estimadores do limite inferior e superior
-    B1_inferior = B1 - math.sqrt(VarB1) * Estatistica_t_Critica
-    B1_superior = B1 + math.sqrt(VarB1) * Estatistica_t_Critica
-    B0_inferior = B0 - math.sqrt(VarB0) * Estatistica_t_Critica
-    B0_superior = B0 + math.sqrt(VarB0) * Estatistica_t_Critica
-    
-    #Gerando o Relatório
-    Relatório = f'''
-    Número de Observações = {Número_de_Observações}\n
-    B0 = {round(B0,5)}\t B1 = {round(B1,5)}\t R-quadrado = {R_quadrado}\n
-    Estimador da Variância = {round(VarianciaReg,5)}\t Erro Padrão da Regressão = {round(EPR,5)}\n
-    Variância de B1 = {round(VarB1,5)}\t Variância de B0 = {round(VarB0,5)}\n
-    Intervalo de Confiança de 95% para B1 (Inferior; B1; Superior): {round(B1_inferior,4)}; {round(B1,4)}; {round(B1_superior,4)}\n
-    Intervalo de Confiança de 95% para B0 (Inferior; B0; Superior): {round(B0_inferior,4)}; {round(B0,4)}; {round(B0_superior,4)}\n
-    Para ver os valores previstos, basta chamar a variável 'Lista_ychapeu_simples'\n
-    Para ver os resíduos, chame a variável 'Resíduos_simples'
-    '''
-    print (Relatório)
-    
-    ##Criando um gráfico
-    #Deixando o estilo bonitinho
-    sns.set_style(style="white")
-
-    #Criando o objeto gráfico
-    Grafico = sns.regplot(x = Lista_x, y = Lista_y, scatter_kws={"color": "black"}, line_kws={"color": "red"})
-    Grafico.set_title("Resultado da Regressão",fontsize = 11)
-    plt.show()
-
-def Regressão_Múltipla(x, y, constante = "S", robusta = "N"):
+def Regressao_Multipla(x, y, constante = "S", robusta = "N"):
     '''
     Função que calcula uma regressão múltipla, sendo, por default, computada com um intercepto e com erros padrões não robustos.
 
@@ -185,13 +122,9 @@ def Regressão_Múltipla(x, y, constante = "S", robusta = "N"):
     EPR = math.sqrt(VarianciaReg)
     
     ##Printando o Resultado
-    #print('Parâmetros:\n', Resultado.params) #O primeiro resultado equivale ao intercepto
-    #print('\nDesvios Padrões:\n', Resultado.bse)
-    #print('Valores Previstos: ', Resultado.predict())
-    #print('\nR2:', Resultado.rsquared)
-    print(f"O erro padrão da regressão é {round(EPR,5)} e a SQR é {round(SQR,5)}\n")
     print(Resultado.summary())
 
+    print(f"O erro padrão da regressão é {round(EPR,5)} e a SQR é {round(SQR,5)}")
     print("\nPara ver os valores previstos ou os resídudos, basta chamar 'Lista_ychapeu' e 'Resíduos'.")
     print("Os resultados do modelo podem ser obtidos através de métodos usando a variável 'Resultado'.")
     print("""
@@ -199,7 +132,7 @@ def Regressão_Múltipla(x, y, constante = "S", robusta = "N"):
     Para ver como achar esse número, entre em https://www.statsmodels.org/dev/examples/notebooks/generated/ols.html"""
     )
 
-def Regressão_MQP(x, y, pesos, constante = "S", robusta = "N"):
+def Regressao_MQP(x, y, pesos, constante = "S", robusta = "N"):
     '''
     Função que calcula uma regressão múltipla usando mínimos quadrados ponderados, ou seja,
     recomendada quando o erro é heteroscedástico E se sabe a função da constante. Ela é, por default, computada com um intercepto e com erros padrões não robustos.
@@ -247,7 +180,7 @@ def Regressão_MQP(x, y, pesos, constante = "S", robusta = "N"):
     Para ver como achar esse número, entre em https://www.statsmodels.org/dev/examples/notebooks/generated/ols.html"""
     )
     
-def Regressão_MQGF(x, y, constante = "S", robusta = "N"):
+def Regressao_MQGF(x, y, constante = "S", robusta = "N"):
     '''
     Função que calcula uma regressão múltipla usando mínimos quadrados generalizados factíveis, ou seja,
     recomendada quando o erro é heteroscedástico E NÃO se sabe a função da constante multiplicativa da variância do erro, sendo os pesos estimados
@@ -263,21 +196,21 @@ def Regressão_MQGF(x, y, constante = "S", robusta = "N"):
     global Resultado, Lista_ychapeu, Resíduos, SQR, EPR
 
     #Regredindo os valores normalmente a fim de pegar os resíduos
-    Regressão_Múltipla(x,y, constante, robusta)
+    Regressao_Multipla(x,y, constante, robusta)
     clear_output()
 
     #Coletando o log dos quadrados dos resíduos
     Log_Res_Quad = np.log(Resíduos**2)
 
     #Regredindo Log_Res_Quad sobre as variáveis explicativas
-    Regressão_Múltipla(x,Log_Res_Quad, constante, robusta)
+    Regressao_Multipla(x,Log_Res_Quad, constante, robusta)
     clear_output()
 
     #Estimando os pesos
     Pesos = np.exp(Lista_ychapeu)
 
     #Fazendo uma Regressão MQP
-    Regressão_MQP(x,y, 1/Pesos, constante, robusta)
+    Regressao_MQP(x,y, 1/Pesos, constante, robusta)
 
 def Teste_LM(x, y, Restrições, Nivel_de_Significância = 0.05):
     '''
@@ -303,11 +236,11 @@ def Teste_LM(x, y, Restrições, Nivel_de_Significância = 0.05):
             ModeloRestrito.append(i)
     
     #Fazendo a regressão do modelo restrito e armazenando os resíduos
-    Regressão_Múltipla(df[ModeloRestrito], y)
+    Regressao_Multipla(df[ModeloRestrito], y)
     Resíduos_r = Resíduos
 
     #Fazendo a regressão dos resíduos sobre as variáveis independentes e armazenando o R2
-    Regressão_Múltipla(x, Resíduos_r)
+    Regressao_Multipla(x, Resíduos_r)
     Ru = Resultado.rsquared
 
     #Calculando a estatística LM
@@ -352,11 +285,11 @@ def Teste_F(x, y, Restrições, Nivel_de_Significância = 0.05):
             ModeloRestrito.append(i)
 
     ##Fazendo as regressões de cada modelo
-    Regressão_Múltipla(x, y)
+    Regressao_Multipla(x, y)
     SQR_ir = SQR
     VarianciaReg_ir = EPR**2
 
-    Regressão_Múltipla(df[ModeloRestrito], y)
+    Regressao_Multipla(df[ModeloRestrito], y)
     SQR_r = SQR
 
     #Limpando a tela
@@ -369,9 +302,9 @@ def Teste_F(x, y, Restrições, Nivel_de_Significância = 0.05):
     P_valor = stats.f.sf(F,GL_r,GL_ir)
 
     if Nivel_de_Significância > P_valor:
-        print(f"O valor de F é {round(F,3)} e seu p-valor é {round(P_valor,7)}. Portanto, rejeita-se Ho a um nível de significância de {Nivel_de_Significância*100}%.")
+        print(f"O valor de F é {round(F,3)} e seu p-valor é {round(P_valor,7)}. Portanto, rejeita-se Ho à significância de {Nivel_de_Significância*100}%.")
     else:
-        print(f"O valor de F é {round(F,3)} e seu p-valor é {round(P_valor,7)}. Portanto, não se rejeita Ho a um nível de significância de {Nivel_de_Significância*100}%.")
+        print(f"O valor de F é {round(F,3)} e seu p-valor é {round(P_valor,7)}. Portanto, não se rejeita Ho à significância de {Nivel_de_Significância*100}%.")
 
 def Teste_t_Dois_Coeficientes_Iguais(x, y, Coeficientes_Testados_para_serem_iguais, Nivel_de_Significância = 0.05):
     '''
@@ -384,7 +317,7 @@ def Teste_t_Dois_Coeficientes_Iguais(x, y, Coeficientes_Testados_para_serem_igua
     '''
     
     ##Fazendo a regressão do modelo irrestrito
-    Regressão_Múltipla(x, y)
+    Regressao_Multipla(x, y)
     clear_output()
 
     #Fazendo o objeto de lista que será usado no teste
@@ -401,7 +334,7 @@ def Teste_t_Dois_Coeficientes_Iguais(x, y, Coeficientes_Testados_para_serem_igua
             Num_de_Variaveis += 1
 
     Teste_t = Resultado.t_test(Teste)
-    print(f"A estatística do teste é {np.around(Teste_t.tvalue[0],3)}, o que resulta em um p-valor de {np.around(Teste_t.pvalue[0],6)}")
+    print(f"A estatística do teste é {Teste_t.tvalue}, o que resulta em um p-valor de {Teste_t.pvalue,6}")
 
 def Teste_Heteroscedasticidade_BP(x, y, constante = "S", Nivel_de_Significância = 0.05, Estatística = "LM"):
     '''
@@ -415,7 +348,7 @@ def Teste_Heteroscedasticidade_BP(x, y, constante = "S", Nivel_de_Significância
     '''
 
     #Fazendo a regressão e limpando a tela
-    Regressão_Múltipla(x,y,constante)
+    Regressao_Multipla(x,y,constante)
     clear_output()
 
     #Calculando o quadrado dos resíduos
@@ -441,7 +374,7 @@ def Teste_Heteroscedasticidade_White(x, y, constante = "S", Nivel_de_Significân
     '''
 
     #Fazendo a regressão e limpando a tela
-    Regressão_Múltipla(x,y,constante)
+    Regressao_Multipla(x,y,constante)
     clear_output()
 
     #Calculando o quadrado dos resíduos
@@ -475,7 +408,7 @@ def RESET(x, y, constante = "S", robusta = "N", Nivel_de_Significância = 0.05):
     Nivel_de_Significância: nível de significância do teste. Caso branco, o nível de significancia padrão é de 5%.
     '''
     #Fazendo uma regressão múltipla e limpando a tela
-    Regressão_Múltipla(x, y, constante)
+    Regressao_Multipla(x, y, constante)
     clear_output()
 
     #Verificando o tipo da covariância selecionada
@@ -511,7 +444,7 @@ def Teste_J_Davidson_MacKinnon(x1,x2, y, constante = "S", robusta = "N", Nivel_d
     '''
     
     #Fazendo a regressão do segundo modelo
-    Regressão_Múltipla(x2, y, constante, robusta)
+    Regressao_Multipla(x2, y, constante, robusta)
     clear_output()
 
     #Criando um novo dataframe e adicionando os valores previstos do modelo 2 à x
@@ -519,7 +452,7 @@ def Teste_J_Davidson_MacKinnon(x1,x2, y, constante = "S", robusta = "N", Nivel_d
     x = pd.concat([x1, Valores_Previstos_2], axis=1, sort=False)
 
     #Fazendo a regressão do primeiro modelo sobre x
-    Regressão_Múltipla(x, y, constante, robusta)
+    Regressao_Multipla(x, y, constante, robusta)
     clear_output()
 
     #Pegando o p-valor do teste

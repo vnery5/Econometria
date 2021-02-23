@@ -37,6 +37,7 @@ import os
 import pathlib
 import glob
 from IPython.display import clear_output
+import gc
 
 ####################################### Criando as Funções ###############################################################
 
@@ -334,7 +335,7 @@ def Teste_t_Dois_Coeficientes_Iguais(x, y, Coeficientes_Testados_para_serem_igua
             Num_de_Variaveis += 1
 
     Teste_t = Resultado.t_test(Teste)
-    print(f"A estatística do teste é {Teste_t.tvalue}, o que resulta em um p-valor de {Teste_t.pvalue,6}")
+    print(f"A estatística do teste é {Teste_t.tvalue}, o que resulta em um p-valor bilateral de {Teste_t.pvalue} e em um p-valor unilateral de {Teste_t.pvalue/2}.")
 
 def Teste_Heteroscedasticidade_BP(x, y, constante = "S", Nivel_de_Significância = 0.05, Estatística = "LM"):
     '''

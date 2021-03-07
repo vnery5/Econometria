@@ -137,11 +137,10 @@ def Regressao_MQP(x, y, pesos, constante = "S", robusta = "N"):
     '''
     Função que calcula uma regressão múltipla usando mínimos quadrados ponderados, ou seja,
     recomendada quando o erro é heteroscedástico E se sabe a função da constante. Ela é, por default, computada com um intercepto e com erros padrões não robustos.
-    multiplicativa da variância do erro.
 
     x: lista ou array com os valores das variáveis independentes;
     y: lista ou array com os valores da variável dependente;
-    pesos: 1/h, sendo h a constante multiplicativa da variância do erro;
+    pesos: 1/h, sendo h a constante multiplicativa da variância do erro (ou seja, sem a raiz);
     constante: "S" para regressão com intercepto e qualquer outro valor para sem intercepto. Caso em branco, a regressão é computada com intercepto;
     robusta: "N" para regressão com erros-padrão tradicionais e qualquer outro valor para erros-padrões robustos. Caso em branco, a regressão é computada com erros-padrão comuns.
     '''
@@ -229,7 +228,6 @@ def Teste_LM(x, y, Restrições, Nivel_de_Significância = 0.05):
     Restrições = list(Restrições)
 
     Numero_de_Observações = len(y)
-    GL_ir = Numero_de_Observações - (len(ModeloIrrestrito) + 1)
     GL_r = len(Restrições)
 
     for i in ModeloIrrestrito:
@@ -543,7 +541,8 @@ def Reg_Painel_MQO_Agrupado(x, y, constante = "S", robusta = "S"):
     x: lista ou array com os valores das variáveis independentes;
     y: lista ou array com os valores da variável dependente;
     constante: "S" para regressão com intercepto e qualquer outro valor para sem intercepto. Caso em branco, a regressão é computada com intercepto;
-    robusta: "N" para regressão com erros-padrão tradicionais e qualquer outro valor para erros-padrões robustos. Caso em branco, a regressão é computada com erros-padrão robustos.
+    robusta: "N" para regressão com erros-padrão tradicionais e qualquer outro valor para erros-padrões robustos.
+        Caso em branco, a regressão é computada com erros-padrão robustos (correlação serial positiva dos erros compostos).
     '''
     global df, Resultado
     

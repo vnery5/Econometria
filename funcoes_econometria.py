@@ -7,6 +7,8 @@
 ##Para coletar os dados do arquivo "carros.dta" (só funciona com arquivos .dta):
 #coletar_dados("carros")
 
+## Para exportar os resultado de latex, procure os métodos de Resultado.summary.as_latex()
+
 ## Exportar resultados como imagem ou texto: https://stackoverflow.com/questions/46664082/python-how-to-save-statsmodels-results-as-image-file
 #######################################################################################################################
 
@@ -18,12 +20,15 @@ import math
 
 #Para Regressão Linear Simples e Teste F
 from scipy import stats
+
 #Para Regressão Linear Múltipla (OLS, GLS e WLS) e Testes Estatísticos
 import statsmodels.api as sm
 import econtools
 import econtools.metrics as mt
+
 #Para Regressão em Painel
 from linearmodels import PanelOLS, FirstDifferenceOLS, PooledOLS, RandomEffects
+from linearmodels.panel import compare
 
 #Pacotes para gráficos (caso precise)
 import matplotlib
@@ -93,7 +98,8 @@ def Regressao_Multipla(x, y, constante = "S", robusta = "N"):
     x: lista ou array com os valores das variáveis independentes;
     y: lista ou array com os valores da variável dependente;
     constante: "S" para regressão com intercepto e qualquer outro valor para sem intercepto. Caso em branco, a regressão é computada com intercepto;
-    robusta: "N" para regressão com erros-padrão tradicionais e qualquer outro valor para erros-padrões robustos. Caso em branco, a regressão é computada com erros-padrão comuns.
+    robusta: "N" para regressão com erros-padrão tradicionais e qualquer outro valor para erros-padrões robustos (HC1, estimador de Hinkley; HC0: White-Huber-Eischer).
+        Caso em branco, a regressão é computada com erros-padrão comuns.
     '''
 
     global Resultado, Lista_ychapeu, Resíduos, SQR, EPR
@@ -305,6 +311,28 @@ def Teste_F(x, y, Restrições, Nivel_de_Significância = 0.05):
     else:
         print(f"O valor de F é {round(F,3)} e seu p-valor é {round(P_valor,7)}. Portanto, não se rejeita Ho à significância de {Nivel_de_Significância*100}%.")
 
+def Teste_F_Rapido_Robusto(H0, Nivel_de_Significância = 0.05):
+    '''
+    Função que calcula um teste F de forma mais rápida com base nas restrições de H0, podendo ser robusto se o Resultado for fruto de uma regressão robusta.
+    H0 deve estar na forma B1 = B2 =...= Valor que deseja ser testado (0 na maioria das vezes)
+    '''
+    global Resultado
+    ## A função utiliza o método wald_test dos resultados das regressões
+    # Para modelos de painel - cujo método usa a estatística LM -, devemos especificar o parâmetro 'formula', o que não ocorre com cortes transversais
+    try:
+        teste = 'LM'
+        est = Resultado.wald_test(formula=H0).stat
+        p = Resultado.wald_test(formula=H0).pval
+    except:
+        teste = 'F'
+        est = float(str(Resultado.wald_test(H0))[19:29])
+        p = float(str(Resultado.wald_test(H0))[36:47])
+
+    if Nivel_de_Significância > p:
+        print(f"O valor de {teste} é {round(est,6)} e seu p-valor é {round(p,7)}.\nPortanto, rejeita-se Ho à significância de {Nivel_de_Significância*100}%, ou seja, as variáveis são conjuntamente significantes.")
+    else:
+        print(f"O valor de {teste} é {round(est,6)} e seu p-valor é {round(p,7)}.\nPortanto, NÃO se rejeita Ho à significância de {Nivel_de_Significância*100}%, ou seja, as variáveis NÃO são conjuntamente significantes.")
+
 def Teste_t_Dois_Coeficientes_Iguais(x, y, Coeficientes_Testados_para_serem_iguais, Nivel_de_Significância = 0.05):
     '''
     Função que executa um teste t para verificar se dois coeficientes são iguais.
@@ -482,7 +510,7 @@ def Arrumar_Painel():
         return None
     
     # pedir a coluna com os períodos de tempo; se o valor for inválido, sair da função.
-    coluna_tempo = str(input('Qual o rótulo da coluna de tempo?\n'))
+    coluna_tempo = str(input('Qual o rótulo da coluna de tempo/agrupamento?\n'))
     if coluna_tempo not in df.columns:
         print("Coluna de tempo não está no dataframe. Insira uma coluna válida e tente novamente!")
         return None
@@ -503,8 +531,15 @@ def Reg_Painel_Primeiras_Diferenças (x,y, robusta = "N"):
     y: lista ou array com os valores da variável dependente;
     robusta: "N" para regressão com erros-padrão tradicionais e qualquer outro valor para erros-padrões robustos. Caso em branco, a regressão é computada com erros-padrão comuns.
     '''
+    global df, Resultado
+
     Modelo = FirstDifferenceOLS(y, x)
-    Resultado = Modelo.fit()
+
+    if robusta == "N":
+        Resultado = Modelo.fit()
+    else:
+        Resultado = Modelo.fit(cov_type = 'robust')
+
     print(Resultado)
 
 def Reg_Painel_Efeitos_Fixos(x, y, constante = "S", robusta = "N"):

@@ -7,12 +7,9 @@
 ##Para coletar os dados do arquivo "carros.dta" (só funciona com arquivos .dta):
 #coletar_dados("carros")
 
-## Para exportar os resultado de latex, procure os métodos de Resultado.summary.as_latex()
-
 ## Exportar resultados como imagem ou texto: https://stackoverflow.com/questions/46664082/python-how-to-save-statsmodels-results-as-image-file
 #######################################################################################################################
 
-#%%
 ##Importando os pacotes e módulos necessários
 import pandas as pd
 import numpy as np
@@ -43,6 +40,7 @@ import pathlib
 import glob
 from IPython.display import clear_output
 import gc
+import subprocess #permite a cópia para o clipboard das equações gerados com as funções equation()
 
 ####################################### Criando as Funções ###############################################################
 
@@ -91,15 +89,16 @@ def coletar_dados(nome = ""):
                 Verifique se seu nome está correto (sem a extensão) e se ele está no mesmo diretório do programa!
                 ''')
 
-def Regressao_Multipla(x, y, constante = "S", robusta = "N"):
+def Regressao_Multipla(x, y, constante = "S", cov = "normal"):
     '''
     Função que calcula uma regressão múltipla, sendo, por default, computada com um intercepto e com erros padrões não robustos.
 
     x: lista ou array com os valores das variáveis independentes;
     y: lista ou array com os valores da variável dependente;
     constante: "S" para regressão com intercepto e qualquer outro valor para sem intercepto. Caso em branco, a regressão é computada com intercepto;
-    robusta: "N" para regressão com erros-padrão tradicionais e qualquer outro valor para erros-padrões robustos (HC1, estimador de Hinkley; HC0: White-Huber-Eischer).
-        Caso em branco, a regressão é computada com erros-padrão comuns.
+    cov: "normal" para regressão com erros-padrão tradicionais (caso padrão);
+        "robust" para erros-padrões robustos.
+        "cluster" ou "clustered" para erros-padrões clusterizados
     '''
 
     global Resultado, Lista_ychapeu, Resíduos, SQR, EPR
@@ -110,13 +109,20 @@ def Regressao_Multipla(x, y, constante = "S", robusta = "N"):
     else:
         X = x
 
-    #Criando o Modelo levando em conta a opção de ser uma regressão robusta p/ heteroscedasticidade ou não
+    #Criando o Modelo levando em conta a opção de erros padrão
     Modelo = sm.OLS(y,X)
 
-    if robusta == "N":
-        Resultado = Modelo.fit()
-    else:
+    if cov == "robust":
         Resultado = Modelo.fit(cov_type = 'HC1', use_t = True)
+    elif cov == "cluster" or cov == "clustered":
+        group = str(input("Qual o rótulo da coluna de grupo?"))
+        try:
+            Resultado = Modelo.fit(cov_type = 'cluster',cov_kwds  ={'groups':df[group]}, use_t = True)
+        except:
+            erro = "Não foi possível encontrar o grupo selecionado. Tente novamente!"
+            return erro
+    else:
+        Resultado = Modelo.fit()
     
     Lista_ychapeu = Resultado.predict()
     Resíduos = y - Lista_ychapeu
@@ -139,7 +145,7 @@ def Regressao_Multipla(x, y, constante = "S", robusta = "N"):
     Para ver como achar esse número, entre em https://www.statsmodels.org/dev/examples/notebooks/generated/ols.html"""
     )
 
-def Regressao_MQP(x, y, pesos, constante = "S", robusta = "N"):
+def Regressao_MQP(x, y, pesos, constante = "S", cov = "normal"):
     '''
     Função que calcula uma regressão múltipla usando mínimos quadrados ponderados, ou seja,
     recomendada quando o erro é heteroscedástico E se sabe a função da constante. Ela é, por default, computada com um intercepto e com erros padrões não robustos.
@@ -148,7 +154,9 @@ def Regressao_MQP(x, y, pesos, constante = "S", robusta = "N"):
     y: lista ou array com os valores da variável dependente;
     pesos: 1/h, sendo h a constante multiplicativa da variância do erro (ou seja, sem a raiz);
     constante: "S" para regressão com intercepto e qualquer outro valor para sem intercepto. Caso em branco, a regressão é computada com intercepto;
-    robusta: "N" para regressão com erros-padrão tradicionais e qualquer outro valor para erros-padrões robustos. Caso em branco, a regressão é computada com erros-padrão comuns.
+    cov: "normal" para regressão com erros-padrão tradicionais (caso padrão);
+        "robust" para erros-padrões robustos.
+        "cluster" para erros-padrões clusterizados
     '''
 
     global Resultado, Lista_ychapeu, Resíduos, SQR, EPR
@@ -158,13 +166,22 @@ def Regressao_MQP(x, y, pesos, constante = "S", robusta = "N"):
         X = sm.add_constant(x)
     else:
         X = x
-    #Criando o Modelo levando em conta a opção de ser uma regressão robusta p/ heteroscedasticidade ou não
+
+    #Criando o Modelo levando em conta a opção de erros padrão
     Modelo = sm.WLS(y,X, weights = pesos)
-    if robusta == "N":
-        Resultado = Modelo.fit()
-    else:
+
+    if cov == "robust":
         Resultado = Modelo.fit(cov_type = 'HC1', use_t = True)
-    
+    elif cov == "cluster" or cov == "clustered":
+        group = str(input("Qual o rótulo da coluna de grupo?"))
+        try:
+            Resultado = Modelo.fit(cov_type = 'cluster',cov_kwds  ={'groups':df[group]}, use_t = True)
+        except:
+            erro = "Não foi possível encontrar o grupo selecionado. Tente novamente!"
+            return erro
+    else:
+        Resultado = Modelo.fit()
+
     Lista_ychapeu = Resultado.predict()
     Resíduos = y - Lista_ychapeu
 
@@ -186,7 +203,7 @@ def Regressao_MQP(x, y, pesos, constante = "S", robusta = "N"):
     Para ver como achar esse número, entre em https://www.statsmodels.org/dev/examples/notebooks/generated/ols.html"""
     )
     
-def Regressao_MQGF(x, y, constante = "S", robusta = "N"):
+def Regressao_MQGF(x, y, constante = "S", cov = "normal"):
     '''
     Função que calcula uma regressão múltipla usando mínimos quadrados generalizados factíveis, ou seja,
     recomendada quando o erro é heteroscedástico E NÃO se sabe a função da constante multiplicativa da variância do erro, sendo os pesos estimados
@@ -196,27 +213,29 @@ def Regressao_MQGF(x, y, constante = "S", robusta = "N"):
     x: lista ou array com os valores das variáveis independentes;
     y: lista ou array com os valores da variável dependente;
     constante: "S" para regressão com intercepto e qualquer outro valor para sem intercepto. Caso em branco, a regressão é computada com intercepto;
-    robusta: "N" para regressão com erros-padrão tradicionais e qualquer outro valor para erros-padrões robustos. Caso em branco, a regressão é computada com erros-padrão comuns.
+    cov: "normal" para regressão com erros-padrão tradicionais (caso padrão);
+        "robust" para erros-padrões robustos.
+        "cluster" ou "clustered" para erros-padrões clusterizados
     '''
 
     global Resultado, Lista_ychapeu, Resíduos, SQR, EPR
 
     #Regredindo os valores normalmente a fim de pegar os resíduos
-    Regressao_Multipla(x,y, constante, robusta)
+    Regressao_Multipla(x,y, constante, cov)
     clear_output()
 
     #Coletando o log dos quadrados dos resíduos
     Log_Res_Quad = np.log(Resíduos**2)
 
     #Regredindo Log_Res_Quad sobre as variáveis explicativas
-    Regressao_Multipla(x,Log_Res_Quad, constante, robusta)
+    Regressao_Multipla(x,Log_Res_Quad, constante, cov)
     clear_output()
 
     #Estimando os pesos
     Pesos = np.exp(Lista_ychapeu)
 
     #Fazendo uma Regressão MQP
-    Regressao_MQP(x,y, 1/Pesos, constante, robusta)
+    Regressao_MQP(x,y, 1/Pesos, constante, cov)
 
 def Teste_LM(x, y, Restrições, Nivel_de_Significância = 0.05):
     '''
@@ -504,13 +523,13 @@ def Arrumar_Painel():
     global df
 
     # pedir a coluna com os indivíduos; se o nome for inválido, sair da função.
-    coluna_individuos = str(input('Qual o rótulo da coluna de indivíduos/observações?\n'))
+    coluna_individuos = str(input('Qual o rótulo da coluna de indivíduos/clusters?\n'))
     if coluna_individuos not in df.columns:
         print("Coluna de indivíduos não está no dataframe. Insira uma coluna válida e tente novamente!")
         return None
     
     # pedir a coluna com os períodos de tempo; se o valor for inválido, sair da função.
-    coluna_tempo = str(input('Qual o rótulo da coluna de tempo/agrupamento?\n'))
+    coluna_tempo = str(input('Qual o rótulo da coluna de tempo/observações dos clusters?\n'))
     if coluna_tempo not in df.columns:
         print("Coluna de tempo não está no dataframe. Insira uma coluna válida e tente novamente!")
         return None
@@ -521,7 +540,7 @@ def Arrumar_Painel():
     df[coluna_tempo] = periodos
     return df
 
-def Reg_Painel_Primeiras_Diferenças (x,y, robusta = "N"):
+def Reg_Painel_Primeiras_Diferenças (x,y, cov = "normal"):
     '''
     Função que calcula uma regressão de primeiras diferenças SEM um intercepto, sendo, por default, computada com erros padrões não robustos.
     Para calcular a regressão com um intercepto, ver o notebook "Cap 13 e 14".
@@ -529,20 +548,26 @@ def Reg_Painel_Primeiras_Diferenças (x,y, robusta = "N"):
     Caso contrário, transformar o dataframe usando a função 'Arrumar Painel'
     x: lista ou array com os valores das variáveis independentes;
     y: lista ou array com os valores da variável dependente;
-    robusta: "N" para regressão com erros-padrão tradicionais e qualquer outro valor para erros-padrões robustos. Caso em branco, a regressão é computada com erros-padrão comuns.
+    cov: "normal" para regressão com erros-padrão tradicionais (caso padrão);
+        "robust" para erros-padrões robustos.
+        "cluster" para erros-padrões clusterizados
     '''
     global df, Resultado
 
     Modelo = FirstDifferenceOLS(y, x)
 
-    if robusta == "N":
-        Resultado = Modelo.fit()
-    else:
+    if cov == "robust":
         Resultado = Modelo.fit(cov_type = 'robust')
+    elif cov == 'kernel': ## correlação robusta à heteroscedasticidade e autocorrelação serial
+        Resultado = Modelo.fit(cov_type = 'kernel')
+    elif cov == 'clustered' or cov == 'cluster':
+        Resultado = Modelo.fit(cov_type = 'clustered', cluster_entity = True)
+    else:
+        Resultado = Modelo.fit()
 
     print(Resultado)
 
-def Reg_Painel_Efeitos_Fixos(x, y, constante = "S", robusta = "N"):
+def Reg_Painel_Efeitos_Fixos(x, y, constante = "S", cov='normal'):
     '''
     Função que calcula uma regressão de efeitos fixos, sendo, por default, computada com um intercepto e com erros padrões não robustos.
     **IMPORTANTE: para o painel estar arrumado, os dados devem estar multi-indexados por indíviduo e por tempo, nesta ordem.
@@ -550,7 +575,9 @@ def Reg_Painel_Efeitos_Fixos(x, y, constante = "S", robusta = "N"):
     x: lista ou array com os valores das variáveis independentes;
     y: lista ou array com os valores da variável dependente;
     constante: "S" para regressão com intercepto e qualquer outro valor para sem intercepto. Caso em branco, a regressão é computada com intercepto;
-    robusta: "N" para regressão com erros-padrão tradicionais e qualquer outro valor para erros-padrões robustos. Caso em branco, a regressão é computada com erros-padrão comuns.
+    cov: "normal" para regressão com erros-padrão tradicionais (caso padrão);
+        "robust" para erros-padrões robustos.
+        "cluster" ou "clustered" para erros-padrões clusterizados
     '''
     global df, Resultado
     
@@ -560,15 +587,21 @@ def Reg_Painel_Efeitos_Fixos(x, y, constante = "S", robusta = "N"):
     else:
         X = x
     
-    #Criando o Modelo levando em conta a opção de ser uma regressão robusta p/ heteroscedasticidade ou não
-    Modelo = PanelOLS(y,X, entity_effects=True)
-    if robusta == "N":
-        Resultado = Modelo.fit()
-    else:
+    #Criando o Modelo levando em conta a opção dos erros padrão
+    Modelo = PanelOLS(y,X, entity_effects=True, drop_absorbed=True)
+
+    if cov == "robust":
         Resultado = Modelo.fit(cov_type = 'robust')
+    elif cov == 'kernel': ## correlação robusta à heteroscedasticidade e autocorrelação serial
+        Resultado = Modelo.fit(cov_type = 'kernel')
+    elif cov == 'clustered' or cov == 'cluster':
+        Resultado = Modelo.fit(cov_type = 'clustered', cluster_entity = True)
+    else:
+        Resultado = Modelo.fit()
+
     print(Resultado)
 
-def Reg_Painel_MQO_Agrupado(x, y, constante = "S", robusta = "S"):
+def Reg_Painel_MQO_Agrupado(x, y, constante = "S", cov = "normal"):
     '''
     Função que calcula uma regressão por MQO agrupado, sendo, por default, computada com um intercepto e com erros padrões  robustos.
     **IMPORTANTE: para o painel estar arrumado, os dados devem estar multi-indexados por indíviduo e por tempo, nesta ordem.
@@ -576,8 +609,9 @@ def Reg_Painel_MQO_Agrupado(x, y, constante = "S", robusta = "S"):
     x: lista ou array com os valores das variáveis independentes;
     y: lista ou array com os valores da variável dependente;
     constante: "S" para regressão com intercepto e qualquer outro valor para sem intercepto. Caso em branco, a regressão é computada com intercepto;
-    robusta: "N" para regressão com erros-padrão tradicionais e qualquer outro valor para erros-padrões robustos.
-        Caso em branco, a regressão é computada com erros-padrão robustos (correlação serial positiva dos erros compostos).
+    cov: "normal" para regressão com erros-padrão tradicionais (caso padrão);
+        "robust" para erros-padrões robustos.
+        "cluster" ou "clustered" para erros-padrões clusterizados
     '''
     global df, Resultado
     
@@ -587,15 +621,20 @@ def Reg_Painel_MQO_Agrupado(x, y, constante = "S", robusta = "S"):
     else:
         X = x
     
-    #Criando o Modelo levando em conta a opção de ser uma regressão robusta p/ heteroscedasticidade ou não
+    #Criando o Modelo levando em conta a opção do erro padrão
     Modelo = PooledOLS(y,X)
-    if robusta == "N":
-        Resultado = Modelo.fit()
-    else:
+
+    if cov == "robust":
         Resultado = Modelo.fit(cov_type = 'robust')
+    elif cov == 'kernel': ## correlação robusta à heteroscedasticidade e autocorrelação serial
+        Resultado = Modelo.fit(cov_type = 'kernel')
+    elif cov == 'clustered' or cov == 'cluster':
+        Resultado = Modelo.fit(cov_type = 'clustered', cluster_entity = True)
+    else:
+        Resultado = Modelo.fit()
     print(Resultado)
 
-def Reg_Painel_Efeitos_Aleatórios(x, y, constante = "S"):
+def Reg_Painel_Efeitos_Aleatórios(x, y, constante = "S", cov = "normal"):
     '''
     Função que calcula uma regressão de efeitos fixos, sendo, por default, computada com um intercepto e com erros padrões  robustos.
     **IMPORTANTE: para o painel estar arrumado, os dados devem estar multi-indexados por indíviduo e por tempo, nesta ordem.
@@ -615,5 +654,101 @@ def Reg_Painel_Efeitos_Aleatórios(x, y, constante = "S"):
     
     #Criando o Modelo
     Modelo = RandomEffects(y,X)
-    Resultado = Modelo.fit()
+    if cov == "robust":
+        Resultado = Modelo.fit(cov_type = 'robust')
+    elif cov == 'kernel': ## correlação robusta à heteroscedasticidade e autocorrelação serial
+        Resultado = Modelo.fit(cov_type = 'kernel')
+    elif cov == 'clustered' or cov == 'cluster':
+        Resultado = Modelo.fit(cov_type = 'clustered', cluster_entity = True)
+    else:
+        Resultado = Modelo.fit()
     print(Resultado)
+
+def hausman_EF_EA(x_inef, y, Nivel_de_Significância = 0.05):
+    '''
+    Função que faz um teste de Hausman, em que H0: Não há correlação entre os efeitos não-observados e as variáveis explicativas
+    x_inef: variáveis explicativas do modelo ineficiente sob H0 (EF);
+    y: variável explicativa
+    '''
+    ## Fazendo a regressão de efeitos fixos e guardando o resultado
+    Reg_Painel_Efeitos_Fixos(x,y)
+    clear_output()
+    fixed = Resultado
+
+    ## Fazendo a regressão de efeitos aleatórios e guardando o resultado
+    Reg_Painel_Efeitos_Aleatórios(x,y)
+    clear_output()
+    random = Resultado
+
+    ## Calculando a estatística de Hausman
+    # calculando a diferença entre os parametros e a variância assíntótica da diferença entre os parametros
+    var_assin = fixed.cov - random.cov
+    d = fixed.params - random.params
+    
+    # calculando H
+    H = d.dot(np.linalg.inv(var_assin)).dot(d)
+    # calculando os graus de liberdade
+    gl = random.params.size -1
+    # Calculando o P-valor do teste
+    p = stats.chi2(gl).sf(H)
+
+    if p < Nivel_de_Significância:
+        print(f"O valor de H é {round(H,6)} com {gl} graus de liberdade na distribuição chi2. O p-valor do teste é {round(p,6)} e, portanto, se rejeita H0 e prefere-se o modelo de efeitos fixos.")
+    else:
+        print(f"O valor de H é {round(H,6)} com {gl} graus de liberdade na distribuição chi2. O p-valor do teste é {round(p,6)} e, portanto, não se rejeita H0 e prefere-se o modelo de efeitos aleatórios.")
+
+def equation(sep_erros= "("):
+    '''
+    Função que gera uma equação formatada do word
+    '''
+    
+    ## capturando os parametros e os erros
+    params = dict(np.around(Resultado.params,3))
+    ## linearmodels usa .std_erros para capturar os erros padrão, sm usa .bse
+    try:
+        std_errors = dict(np.around(Resultado.std_errors,5))
+    except:
+        std_errors = dict(np.around(Resultado.bse,5))
+
+    ## fazendo o loop para pegar os coeficientes*nome das variáveis e os seus erros-padrão entre parênteses
+    parametros = ""
+    erros = ""
+    for i in params.keys():
+        # levando em conta a chave escolhida pelo usuário
+        if sep_erros == "("
+            erros += f" & ({std_errors[i]})"
+        else:
+            erros += f" & [{std_errors[i]}]"
+
+        if i != 'const':
+            if params[i] > 0:
+                parametros += f" & + {params[i]}{i}"
+            else:
+                parametros += f" & - {-params[i]}{i}"
+        else:
+            parametros += f"{params[i]}"
+    
+    ## Fazendo a str que irá pro word (em forma de matriz)
+    inicio = "\matrix{"
+    fim = "}"
+
+    # linearmodels usa model.dependente; sm usa model.endog_names
+    try:
+        y = Resultado.model.dependent.dataframe.columns[0]
+    except:
+        y = Resultado.model.endog_names
+    word = f"{inicio}{y} & = & {parametros} \\\ & {erros}{fim}"
+
+    ## Adicionando o numero de obs e os r2
+    # linearmodels usa .entity_info['total'] no numero de observações, sm usa nobs
+    try:
+        word += f"\nn = {int(dict(Resultado.entity_info)['total'])}; R^2 = {np.around(Resultado.rsquared,3)}"
+    except:
+         word += f"\nn = {int(Resultado.nobs)}; R^2 = {np.around(Resultado.rsquared,3)}; R\\bar^2 = {np.around(Resultado.rsquared_adj,3)}"
+
+    ## substituindo os . por ,
+    word = word.replace(".",",")
+    
+    ## copiando para o clipboard e printando o sucesso
+    subprocess.run("pbcopy", universal_newlines=True, input=word)
+    print("O código da equação foi copiado para o clipboard!")

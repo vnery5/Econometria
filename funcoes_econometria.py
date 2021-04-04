@@ -7,7 +7,6 @@
 ##Para coletar os dados do arquivo "carros.dta" (só funciona com arquivos .dta):
 #coletar_dados("carros")
 
-## Exportar resultados como imagem ou texto: https://stackoverflow.com/questions/46664082/python-how-to-save-statsmodels-results-as-image-file
 #######################################################################################################################
 
 ##Importando os pacotes e módulos necessários
@@ -23,9 +22,10 @@ import statsmodels.api as sm
 import econtools
 import econtools.metrics as mt
 
-#Para Regressão em Painel
+#Para Regressão em Painel e IV
 from linearmodels import PanelOLS, FirstDifferenceOLS, PooledOLS, RandomEffects
 from linearmodels.panel import compare
+from linearmodels.iv import IV2SLS
 
 #Pacotes para gráficos (caso precise)
 import matplotlib
@@ -392,6 +392,7 @@ def Teste_Heteroscedasticidade_BP(x, y, constante = "S", Nivel_de_Significância
     Nivel_de_Significância: nível de significância do teste. Caso branco, o nível de significancia padrão é de 5%.
     Estatística = LM ou F
     '''
+    global Resultado 
 
     #Fazendo a regressão e limpando a tela
     Regressao_Multipla(x,y,constante)
@@ -408,26 +409,25 @@ def Teste_Heteroscedasticidade_BP(x, y, constante = "S", Nivel_de_Significância
         Teste_F(x, Res_Quad, x, Nivel_de_Significância)
         print("Ho: O erro é homoscedástico")
 
-def Teste_Heteroscedasticidade_White(x, y, constante = "S", Nivel_de_Significância = 0.05, Estatística = "LM"):
+def Teste_Heteroscedasticidade_White(modelo, constante = "S", Nivel_de_Significância = 0.05, Estatística = "LM"):
     '''
     Função que executa o teste de White (modificado por Wooldridge) para a heteroscedasticidade.
 
-    x: lista ou array com os valores das variáveis independentes;
-    y: lista ou array com os valores da variável dependente;
+    modelo: objeto do fit
     constante: "S" para regressão com intercepto e qualquer outro valor para sem intercepto. Caso em branco, a regressão é computada com intercepto;
     Nivel_de_Significância: nível de significância do teste. Caso branco, o nível de significancia padrão é de 5%.
     Estatística: LM ou F
     '''
+    global Resultado
 
-    #Fazendo a regressão e limpando a tela
-    Regressao_Multipla(x,y,constante)
-    clear_output()
-
-    #Calculando o quadrado dos resíduos
-    Res_Quad = Resultado.resid**2
+    ## Calculando o quadrado dos resíduos
+    try: # para objetos do sm
+        Res_Quad = Resultado.resid**2
+    except Exception: # para objetos do linearmodels
+        Res_Quad = Resultado.resids**2
 
     #Calculando o quadrado dos valores previstos
-    Previstos = Lista_ychapeu
+    Previstos = Resultado.predict()
     Previstos2 = Previstos**2
 
     #Criando um dataframe pra armazenar esses valores
@@ -525,13 +525,13 @@ def Arrumar_Painel():
     # pedir a coluna com os indivíduos; se o nome for inválido, sair da função.
     coluna_individuos = str(input('Qual o rótulo da coluna de indivíduos/clusters?\n'))
     if coluna_individuos not in df.columns:
-        print("Coluna de indivíduos não está no dataframe. Insira uma coluna válida e tente novamente!")
+        print("Coluna de indivíduos/clusters não está no dataframe. Insira uma coluna válida e tente novamente!")
         return None
     
     # pedir a coluna com os períodos de tempo; se o valor for inválido, sair da função.
     coluna_tempo = str(input('Qual o rótulo da coluna de tempo/observações dos clusters?\n'))
     if coluna_tempo not in df.columns:
-        print("Coluna de tempo não está no dataframe. Insira uma coluna válida e tente novamente!")
+        print("Coluna de tempo/observações não está no dataframe. Insira uma coluna válida e tente novamente!")
         return None
 
     ## arrumando o painel
@@ -671,12 +671,12 @@ def hausman_EF_EA(x_inef, y, Nivel_de_Significância = 0.05):
     y: variável explicativa
     '''
     ## Fazendo a regressão de efeitos fixos e guardando o resultado
-    Reg_Painel_Efeitos_Fixos(x,y)
+    Reg_Painel_Efeitos_Fixos(x_inef,y)
     clear_output()
     fixed = Resultado
 
     ## Fazendo a regressão de efeitos aleatórios e guardando o resultado
-    Reg_Painel_Efeitos_Aleatórios(x,y)
+    Reg_Painel_Efeitos_Aleatórios(x_inef,y)
     clear_output()
     random = Resultado
 
@@ -697,55 +697,162 @@ def hausman_EF_EA(x_inef, y, Nivel_de_Significância = 0.05):
     else:
         print(f"O valor de H é {round(H,6)} com {gl} graus de liberdade na distribuição chi2. O p-valor do teste é {round(p,6)} e, portanto, não se rejeita H0 e prefere-se o modelo de efeitos aleatórios.")
 
+def Regressao_IV_MQ2E(exog, endog, instrumentos, y, constante="S",cov='normal'):
+    global df, Resultado
+    ## formando o vetor de variáveis exógenas
+    if constante == "S":
+        try:
+            exog = sm.add_constant(exog)
+        except Exception: ## se não houver exógenas no modelo
+            #criando um vetor de uns com o mesmo número de observações da variável endógena
+            exog = np.resize([1],endog.shape[0]) 
+            # renomeando para const
+            exog = pd.DataFrame({'const':exog})
+    else:
+        exog = exog
+    
+    ## criando o modelo levando em conta a opção de covariância
+    Modelo = IV2SLS(y,exog,endog,instrumentos)
+    if cov == "robust":
+        Resultado = Modelo.fit(cov_type = 'robust')
+    elif cov == 'kernel': ## correlação robusta à heteroscedasticidade e autocorrelação serial
+        Resultado = Modelo.fit(cov_type = 'kernel')
+    elif cov == 'clustered' or cov == 'cluster':
+        Resultado = Modelo.fit(cov_type = 'clustered', cluster_entity = True)
+    else:
+        Resultado = Modelo.fit(cov_type='unadjusted')
+    
+    print(Resultado)
+    print("\nPara ver os resultados do 1º estágio/equação reduzida (e ver se os instrumentos são relevantes com o Partial P-Value, chame 'Resultado.first_stage'.")
+    print("\nPara testar a exogeneidade da variável instrumentada, chame 'Resultado.wooldridge_regression' ou 'Resultado.wooldridge_score' ou 'Resultado.wu_hausman([variaveis])'.")
+    print("\nPara testar a exogeneidade dos instrumentos (quando eles forem mais numerosos que as variáveis endógenas (restrições sobreidentificadoras)), chame 'Resultado.wooldridge_overid', onde Ho: todos os instrumentos são exógenos.\n")
+
 def equation(sep_erros= "("):
     '''
     Função que gera uma equação formatada do word
     '''
-    
-    ## capturando os parametros e os erros
-    params = dict(np.around(Resultado.params,3))
-    ## linearmodels usa .std_erros para capturar os erros padrão, sm usa .bse
-    try:
-        std_errors = dict(np.around(Resultado.std_errors,5))
-    except:
-        std_errors = dict(np.around(Resultado.bse,5))
-
-    ## fazendo o loop para pegar os coeficientes*nome das variáveis e os seus erros-padrão entre parênteses
-    parametros = ""
-    erros = ""
-    for i in params.keys():
-        # levando em conta a chave escolhida pelo usuário
-        if sep_erros == "("
-            erros += f" & ({std_errors[i]})"
-        else:
-            erros += f" & [{std_errors[i]}]"
-
-        if i != 'const':
-            if params[i] > 0:
-                parametros += f" & + {params[i]}{i}"
-            else:
-                parametros += f" & - {-params[i]}{i}"
-        else:
-            parametros += f"{params[i]}"
-    
     ## Fazendo a str que irá pro word (em forma de matriz)
     inicio = "\matrix{"
     fim = "}"
 
-    # linearmodels usa model.dependente; sm usa model.endog_names
+    ## capturando os parametros, p-valores e os erros
+    params = dict(np.around(Resultado.params,3))
+    p_values = dict(np.around(Resultado.pvalues,4))
+
+    ## linearmodels usa .std_erros para capturar os erros padrão, sm usa .bse
     try:
-        y = Resultado.model.dependent.dataframe.columns[0]
-    except:
+        std_errors = dict(np.around(Resultado.std_errors,4))
+    except Exception:
+        std_errors = dict(np.around(Resultado.bse,4))
+    
+    ## capturando as variáveis independentes indexadas por seu numero
+    enum_params = dict(enumerate(params.keys()))
+    enum_params = {value:key for key, value in enum_params.items()}
+    
+    ## pegando o nome da variável dependente
+        # linearmodels usa model.dependent.dataframe.columns[0] para modelos de painel 
+        # e model.dependent.cols para modelos de IV;
+        # sm usa model.endog_names
+    try:
+        try: # modelos de painel
+            y = Resultado.model.dependent.dataframe.columns[0]
+        except Exception: # modelos de IV 2SLS
+            y = Resultado.model.dependent.pandas.columns[0]
+    except Exception: # modelos comuns
         y = Resultado.model.endog_names
-    word = f"{inicio}{y} & = & {parametros} \\\ & {erros}{fim}"
+    
+    ## criando uma lista com ints até o número de linhas definido pelo usuário
+    # temos que nos lembrar que no word só cabe ≈ 4 parâmetros por linha
+        # math.ceil arredonda para cima; o + 1 é por conta de o python não considerar range como um intervalo fechado superiormente
+    breaks = [4*num for num in range (1,math.ceil(len(Resultado.params)/4) + 1)]
 
-    ## Adicionando o numero de obs e os r2
-    # linearmodels usa .entity_info['total'] no numero de observações, sm usa nobs
+    ## fazendo o loop para pegar os coeficientes*nome das variáveis e os seus erros-padrão entre o separador de erros
+    parametros = ""
+    erros = ""
+    # criando o início da string, com o identificador de matriz, o nome de y e o sinal de = 
+    word = f"{inicio}{y} & = &"
+    # loop compllicado: pra cada variável dependente, queremos checar se ela é a 5a, 9a...
+        # caso seja, adicionamos a string criada até então e resetamos os parametros e erros, continuando o processo
+        # caso não seja, o processo é realizado normalmente
+    for i in params.keys():
+        if enum_params[i] in breaks: # se for a 5a, 9a, 13a...
+            ## adicionando os parametros e erros à matriz e resetando seu valores
+            word += f"{parametros} \\\ & {erros} \\\ & "
+            parametros = ""
+            erros = ""
+
+            # levando em conta a chave escolhida pelo usuário
+            if sep_erros == "(":
+                erros += f" & ({std_errors[i]})"
+            else:
+                erros += f" & [{std_errors[i]}]"
+            # fazendo a string dos parâmetros:
+                # *: p<0.1; **: p<0.05; ***: p<0.01
+            if i != 'const':
+                p = p_values[i]
+                if params[i] > 0:
+                    if p > 0.1:
+                        parametros += f" & + {params[i]}{i}"
+                    elif p < 0.01:
+                        parametros += f" & + {params[i]}{i}^{{***}}"
+                    elif p < 0.05:
+                        parametros += f" & + {params[i]}{i}^{{**}}"
+                    else:
+                        parametros += f" & + {params[i]}{i}^{{*}}"
+                else:
+                    if p > 0.1:
+                        parametros += f" & - {-params[i]}{i}"
+                    elif p < 0.01:
+                        parametros += f" & - {-params[i]}{i}^{{***}}"
+                    elif p < 0.05:
+                        parametros += f" & - {-params[i]}{i}^{{**}}"
+                    else:
+                        parametros += f" & - {-params[i]}{i}^{{*}}"
+            else:
+                parametros += f"{params[i]}"
+        else: # se não for a última variável independente da linha
+            # levando em conta a chave escolhida pelo usuário
+            if sep_erros == "(":
+                erros += f" & ({std_errors[i]})"
+            else:
+                erros += f" & [{std_errors[i]}]"
+            # fazendo a string dos parâmetros:
+                # *: p<0.1; **: p<0.05; ***: p<0.01
+            if i != 'const':
+                p = p_values[i]
+                if params[i] > 0:
+                    if p > 0.1:
+                        parametros += f" & + {params[i]}{i}"
+                    elif p < 0.01:
+                        parametros += f" & + {params[i]}{i}^{{***}}"
+                    elif p < 0.05:
+                        parametros += f" & + {params[i]}{i}^{{**}}"
+                    else:
+                        parametros += f" & + {params[i]}{i}^{{*}}"
+                else:
+                    if p > 0.1:
+                        parametros += f" & - {-params[i]}{i}"
+                    elif p < 0.01:
+                        parametros += f" & - {-params[i]}{i}^{{***}}"
+                    elif p < 0.05:
+                        parametros += f" & - {-params[i]}{i}^{{**}}"
+                    else:
+                        parametros += f" & - {-params[i]}{i}^{{*}}"
+            else:
+                parametros += f"{params[i]}"
+
+    ## adicionando os termos residuais e fechando a sintaxe da matriz
+    word += f"{parametros} \\\ & {erros}"
+    word += fim
+
+    ## Adicionando o numero de obs e os r2 (quando rsquared_adj estiver disponível)
     try:
-        word += f"\nn = {int(dict(Resultado.entity_info)['total'])}; R^2 = {np.around(Resultado.rsquared,3)}"
-    except:
-         word += f"\nn = {int(Resultado.nobs)}; R^2 = {np.around(Resultado.rsquared,3)}; R\\bar^2 = {np.around(Resultado.rsquared_adj,3)}"
+        word += f"\nn = {int(Resultado.nobs)}; R^2 = {np.around(Resultado.rsquared,4)}; \\bar{{R^2}} = {np.around(Resultado.rsquared_adj,4)}"
+    except Exception:
+        word += f"\nn = {int(Resultado.nobs)}; R^2 = {np.around(Resultado.rsquared,4)}"
 
+    ## adicionando a explicação dos p-valores
+    word += "\n^* p<0.1; ^{**} p<0.05; ^{***} p<0.01"
     ## substituindo os . por ,
     word = word.replace(".",",")
     

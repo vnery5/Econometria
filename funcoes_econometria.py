@@ -41,6 +41,7 @@ import glob
 from IPython.display import clear_output
 import gc
 import subprocess #permite a cópia para o clipboard das equações gerados com as funções equation()
+from rich import inspect # permite ver os métodos de um objeto com inspect(objeto, methods=True)
 
 ####################################### Criando as Funções ###############################################################
 
@@ -122,7 +123,7 @@ def Regressao_Multipla(x, y, constante = "S", cov = "normal"):
             erro = "Não foi possível encontrar o grupo selecionado. Tente novamente!"
             return erro
     else:
-        Resultado = Modelo.fit()
+        Resultado = Modelo.fit(use_t = True)
     
     Lista_ychapeu = Resultado.predict()
     Resíduos = y - Lista_ychapeu
@@ -463,7 +464,7 @@ def RESET(x, y, constante = "S", robusta = "N", Nivel_de_Significância = 0.05):
     else:
         tipo = 'HC1'
 
-    Teste = sm.stats.diagnostic.linear_reset(Resultado, power = 2, use_f = False, cov_type = tipo)
+    Teste = sm.stats.diagnostic.linear_reset(Resultado, power = 3, use_f = False, cov_type = tipo)
     
     if Teste.pvalue < Nivel_de_Significância:
         print(f"""
@@ -727,7 +728,7 @@ def Regressao_IV_MQ2E(exog, endog, instrumentos, y, constante="S",cov='normal'):
     print("\nPara testar a exogeneidade da variável instrumentada, chame 'Resultado.wooldridge_regression' ou 'Resultado.wooldridge_score' ou 'Resultado.wu_hausman([variaveis])'.")
     print("\nPara testar a exogeneidade dos instrumentos (quando eles forem mais numerosos que as variáveis endógenas (restrições sobreidentificadoras)), chame 'Resultado.wooldridge_overid', onde Ho: todos os instrumentos são exógenos.\n")
 
-def equation(sep_erros= "("):
+def equation(sep_erros= "["):
     '''
     Função que gera uma equação formatada do word
     '''
@@ -764,7 +765,7 @@ def equation(sep_erros= "("):
     ## criando uma lista com ints até o número de linhas definido pelo usuário
     # temos que nos lembrar que no word só cabe ≈ 4 parâmetros por linha
         # math.ceil arredonda para cima; o + 1 é por conta de o python não considerar range como um intervalo fechado superiormente
-    breaks = [4*num for num in range (1,math.ceil(len(Resultado.params)/4) + 1)]
+    breaks = [3*num for num in range (1,math.ceil(len(Resultado.params)/3) + 1)]
 
     ## fazendo o loop para pegar os coeficientes*nome das variáveis e os seus erros-padrão entre o separador de erros
     parametros = ""
@@ -853,8 +854,11 @@ def equation(sep_erros= "("):
 
     ## adicionando a explicação dos p-valores
     word += "\n^* p<0.1; ^{**} p<0.05; ^{***} p<0.01"
+
     ## substituindo os . por ,
     word = word.replace(".",",")
+    ## permitindo _ nas strings (latex entende _ como atalho para subscrito)
+    word = word.replace("_","\\_")
     
     ## copiando para o clipboard e printando o sucesso
     subprocess.run("pbcopy", universal_newlines=True, input=word)

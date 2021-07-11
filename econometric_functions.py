@@ -1,5 +1,5 @@
 # Created by: Vinícius de Almeida Nery Ferreira (ECO - UnB)
-#Github: https://github.com/vnery5/Econometria
+# Github: https://github.com/vnery5/Econometria
 
 ## Importing
 import pandas as pd
@@ -41,7 +41,7 @@ import subprocess #permite a cópia para o clipboard das equações gerados com 
 
 ####################################### Functions ###############################################################
 ####################################### .dta Data Colection ###############################################################
-def get_data(name = ""):
+def get_data_stata(name = ""):
     '''
     Reads STATA (.dta) archives; the extension is not necessary
     The file must be in the same folder as the .py ou .ipynb archive

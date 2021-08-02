@@ -88,7 +88,8 @@ def OLS_reg(formula, data, cov = 'unadjusted'):
     """
     Fits a standard OLS model with the corresponding covariance matrix.
     To compute without an intercept, use -1 in the formula.
-    Remember to use mod = OLS_reg(...)
+    Remember to use mod = OLS_reg(...).
+    For generalized and weighted estimation, see statsmodels documentation or the first version of this file.
     cov : str
         unadjusted: common standard errors
         robust: HC1 standard errors
@@ -117,7 +118,7 @@ def f_test(H0, model, level = 0.05):
     Calculates a F test based on H0 restrictions. Uses the same type of covariance as the model.
     It is not necessary to assign the function to an object!
 
-    H0 : must be on standard patsy syntax ('(B1 = B2 =...), ...')
+    H0 : must be on standard patsy syntax ('(var1 = var2 =...), ...')
     model: fit instance (usually 'mod')
     '''
     ## usually, we use the wald_test method from the fit instance
@@ -297,8 +298,7 @@ def panel_structure(data, entity_column, time_column):
 def pooled_ols(panel_data, formula, cov = "unadjusted"):
     """
     Fits a standard Pooleed OLS model with the corresponding covariance matrix.
-    Remember to include a intercept in the formula!
-    Remember to use mod = OLS_reg(...)!
+    Remember to include a intercept in the formula and to assign it to an object!
 
     panel_data : dataframe (which must be in a panel structure)
     formula : patsy formula
@@ -323,7 +323,7 @@ def pooled_ols(panel_data, formula, cov = "unadjusted"):
 def first_difference(panel_data, formula, cov = "unadjusted"):
     """
     Fits a standard FD model with the corresponding covariance matrix and WITHOUT an intercept.
-    Remember to use mod = OLS_reg(...)!
+    Remember to assign it to an object!
     
     panel_data : dataframe (which must be in a panel structure)
     formula : patsy formula
@@ -350,7 +350,7 @@ def fixed_effects(panel_data, formula, time_effects = False, cov = "unadjusted")
     It can be estimated WITH and WITHOUT a constant.
     It is preferred when the unobserved effects are correlated with the error term
     and, therefore, CAN'T estimate constant terms.
-    Remember to use mod = OLS_reg(...)!
+    Remember to assign it to an object!
 
     panel_data : dataframe (which must be in a panel structure)
     formula : patsy formula
@@ -385,7 +385,7 @@ def random_effects(panel_data, formula, cov = "unadjusted"):
     It can be estimated WITH and WITHOUT a constant.
     It is preferred when the unobserved effects aren't correlated with the error term
     and, therefore, CAN estimate constant terms.
-    Remember to use mod = OLS_reg(...)!
+    Remember to assign it to an object!
 
     panel_data : dataframe (which must be in a panel structure)
     formula : patsy formula
@@ -486,7 +486,7 @@ def iv_2sls(data, formula, cov = "unadjusted"):
     return mod
 
 ####################################### Variáveis Dependentes Discretas e Seleção Amostral ###############################################################
-## MISSING: Tobit and discontinous/censored regressions
+## MISSING: Heckit, Tobit and discontinous/censored regressions
 ## Heckman procedures for sample correction can be imported from the Heckman.py file
 # Alternatively, these models can be used in R, as examplified in the file 'Tobit_Heckman.R'
 

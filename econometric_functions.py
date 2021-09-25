@@ -1,9 +1,13 @@
-# Created by: Vinícius de Almeida Nery Ferreira (ECO - UnB)
-# Github: https://github.com/vnery5/Econometria
+"""
+Functions that will do most of the basic econometric regression models and tests.
+Based on the seminal book of Introduction to Econometrics by Jeffrey Wooldridge.
+Author: Vinícius de Almeida Nery Ferreira (ECO - UnB)
+E-mail: vnery5@gmail.com
+Github: https://github.com/vnery5/Econometria
+"""
 
 ## Importing
 import pandas as pd
-# import swifter # vectorizes function operations in dataframes
 import numpy as np
 
 # Linear Regression and Statistical Tests
@@ -37,8 +41,6 @@ import pathlib
 import glob
 from IPython.display import clear_output
 import gc
-import subprocess  # permite a cópia para o clipboard das equações gerados com as funções equation()
-
 
 ####################################### Functions ###############################################################
 ####################################### .dta Data Colection ###########################################################
@@ -90,16 +92,16 @@ def get_data_stata(name=""):
             except Exception:  # file not found
                 print('''
                 It was not possible to find the requested file :(\n
-                Check if the name is correct (without the extension) and if the file is in the same directory as this program!
+                Check the file name (without the extension) and if the file is in the same directory as this program!
                 ''')
 
 
 ####################################### Variáveis Dependentes Contínuas ##############################################
-def OLS_reg(formula, data, cov='unadjusted'):
+def ols_reg(formula, data, cov='unadjusted'):
     """
     Fits a standard OLS model with the corresponding covariance matrix.
     To compute without an intercept, use -1 in the formula.
-    Remember to use mod = OLS_reg(...).
+    Remember to use mod = ols_reg(...).
     For generalized and weighted estimation, see statsmodels documentation or the first version of this file.
     :param formula: patsy formula
     :param data: dataframe containing the data
@@ -430,7 +432,7 @@ def random_effects(panel_data, formula, cov="unadjusted"):
     return mod
 
 
-def hausman_fe_re(panel_data, inef_formula, level=0.05, cov="unadjusted"):
+def hausman_fe_re(panel_data, inef_formula, cov="unadjusted", level=0.05):
     """
     Executes a Hausman test, which H0: there is not correlation between unobserved effects and the independent variables
     It is not necessary to assign the function to an object!
@@ -441,6 +443,7 @@ def hausman_fe_re(panel_data, inef_formula, level=0.05, cov="unadjusted"):
         unadjusted: common standard errors
         robust: robust standard errors
         kernel: robust to heteroskedacity AND serial autocorrelation
+    :param level : significance level for the test. Defaults to 5%.
     """
 
     ## Random Effects
@@ -506,12 +509,12 @@ def iv_2sls(data, formula, cov="unadjusted"):
     ## printing the summary
     print(mod.summary)
     # printing helpful information
-    print(
-        "\nIn order to see the first stage results (and check if the instruments are relevant with the 'Partial P-Value'), call 'mod.first_stage'.")
-    print(
-        "\nTo check if the instrumentated variable is exogenous, call 'mod.wooldridge_regression' or 'mod.wooldridge_regression'.")
-    print(
-        "\nTo test for the exogeneity of the instruments (when they are more numerous than the number of endogenous variable - therefore, are overidentified restrictions), call 'mod.wooldridge_overid', where Ho: instruments are exogenous.\n")
+    print("In order to see first stage results (and check if the instruments are relevant with the 'Partial P-Value'), "
+          "call 'mod.first_stage'.")
+    print("To check if the instrumentated variable is exogenous, call 'mod.wooldridge_regression' or "
+          "'mod.wooldridge_regression'.")
+    print("To test for the instruments exogeneity (when they are more numerous than the number of endogenous variables "
+          "- therefore, are overidentified restrictions), call 'mod.wooldridge_overid' (Ho: instruments are exogenous)")
 
     ## returning the object
     return mod
@@ -525,8 +528,8 @@ def iv_2sls(data, formula, cov="unadjusted"):
 def probit_logit(formula, data, model=probit, cov='normal'):
     """
     Creates a probit/logit model and returns its summary and average parcial effects (get_margeff).
-    Documentation can be found at https://www.statsmodels.org/stable/examples/notebooks/generated/discrete_choice_example.html
-    Remember to use mod = OLS_reg(...)!
+    Documentation: https://www.statsmodels.org/stable/examples/notebooks/generated/discrete_choice_example.html
+    Remember to use mod = probit_logit(...)!
     
     :param formula: patsy formula
     :param data: dataframe
@@ -570,8 +573,8 @@ def probit_logit(formula, data, model=probit, cov='normal'):
 def poisson_reg(formula, data, cov='normal'):
     """
     Creates a poisson model and returns its summary and average parcial effects (get_margeff).
-    Documentation can be found at https://www.statsmodels.org/stable/examples/notebooks/generated/discrete_choice_example.html
-    Remember to use mod = OLS_reg(...)!
+    Documentation: https://www.statsmodels.org/stable/examples/notebooks/generated/discrete_choice_example.html
+    Remember to use mod = poisson_reeg(...)!
 
     :param formula: patsy formula
     :param data: dataframe

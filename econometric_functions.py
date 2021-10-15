@@ -43,7 +43,7 @@ from IPython.display import clear_output
 import gc
 
 ####################################### Functions ###############################################################
-####################################### .dta Data Colection ###########################################################
+####################################### .dta Data Collection ###########################################################
 def get_data_stata(name=""):
     """
     Reads STATA (.dta) archives; the extension is not necessary.
@@ -90,20 +90,18 @@ def get_data_stata(name=""):
                 print(f"{name}.dta was read successfully!")
                 return df
             except Exception:  # file not found
-                print('''
-                It was not possible to find the requested file :(\n
-                Check the file name (without the extension) and if the file is in the same directory as this program!
-                ''')
+                print("It was not possible to find the requested file :(")
+                print("Check the file name (without the extension) and if it is in the same directory as this program!")
 
 
-####################################### Variáveis Dependentes Contínuas ##############################################
+####################################### Continuous Dependent Variables ##############################################
 def ols_reg(formula, data, cov='unadjusted'):
     """
     Fits a standard OLS model with the corresponding covariance matrix.
     To compute without an intercept, use -1 in the formula.
     Remember to use mod = ols_reg(...).
     For generalized and weighted estimation, see statsmodels documentation or the first version of this file.
-    :param formula: patsy formula
+    :param formula: patsy formula (R style)
     :param data: dataframe containing the data
     :param cov : str
         unadjusted: common standard errors
@@ -239,15 +237,11 @@ def reset_ols(formula, data, cov='normal', level=0.05):
     ## executing test
     test = linear_reset(mod, power=3, use_f=False, cov_type=cov_type)
     if test.pvalue < level:
-        print(f"""
-        The test's p-value is equal to {np.around(test.pvalue, 6)} < {level * 100}%\n
-        Therefore, Ho is rejected (the model is badly specified)."""
-              )
+        print(f"The test's p-value is equal to {np.around(test.pvalue, 6)} < {level * 100}%")
+        print("Therefore, Ho is rejected (the model is badly specified).")
     else:
-        print(f"""
-        The test's p-value is equal to {np.around(test.pvalue, 6)} > {level * 100}%\n
-        Therefore, Ho is NOT rejected (the model is not badly specified)."""
-              )
+        print(f"The test's p-value is equal to {np.around(test.pvalue, 6)} > {level * 100}%")
+        print("Therefore, Ho is NOT rejected (the model is not badly specified).")
 
 
 def j_davidson_mackinnon_ols(formula1, formula2, data, cov='normal', level=0.05):
@@ -287,15 +281,11 @@ def j_davidson_mackinnon_ols(formula1, formula2, data, cov='normal', level=0.05)
     p = mod1.pvalues[-1]
 
     if p < level:
-        print(f"""
-        The test's p-value is equal to {np.around(p, 6)} < {level * 100}%\n
-        Therefore, Ho is rejected (model 2 is better specified)."""
-              )
+        print(f"The test's p-value is equal to {np.around(p, 6)} < {level * 100}%")
+        print("Therefore, Ho is rejected (model 2 is better specified).")
     else:
-        print(f"""
-        The test's p-value is equal to {np.around(p, 6)} > {level * 100}%\n
-        Therefore, Ho is NOT rejected (model 1 is better specified)."""
-              )
+        print(f"The test's p-value is equal to {np.around(p, 6)} > {level * 100}%")
+        print("Therefore, Ho is rejected (model 1 is better specified).")
 
 
 ####################################### Panel Models (linearmodels) ##########################################
@@ -307,67 +297,77 @@ def panel_structure(data, entity_column, time_column):
     :param entity_column : str, column that represents the individuals (1st level index)
     :param time_column : str, column that represents the time periods (2nd level index)
     """
+
+    ## Creating MultiIndex and maintains columns in the DataFrame
     try:
         time = pd.Categorical(data[time_column])
         data = data.set_index([entity_column, time_column])
         data[time_column] = time  # creating a column with the time values (makes it easier to access it later)
+        return data
     except Exception:
         print("One of the columns is not in the dataframe. Please try again!")
         return None
 
 
-def pooled_ols(panel_data, formula, cov="unadjusted"):
+def pooled_ols(panel_data, formula, weights=None, cov="unadjusted"):
     """
-    Fits a standard Pooleed OLS model with the corresponding covariance matrix.
+    Fits a standard Pooled OLS model with the corresponding covariance matrix.
     Remember to include a intercept in the formula and to assign it to an object!
 
     :param panel_data : dataframe (which must be in a panel structure)
     :param formula : patsy formula
+    :param weights : N x 1 Series or vector containing weights to be used in estimation; defaults to None
+        Use is recommended when analyzing survey data, passing on the weight available in the survey
     :param cov : str
         unadjusted: common standard errors
         robust: robust standard errors
         kernel: robust to heteroskedacity AND serial autocorrelation
-        cluster or clustered: clustered standard errors by the entity column
+        clustered: clustered standard errors by the entity column
     """
 
-    ## creating model instance
-    mod = PooledOLS.from_formula(formula=formula, data=panel_data)
-
-    if cov == 'clustered' or cov == 'cluster':
-        mod = mod.fit(cov_type='clustered', cluster_entity=True)
+    ## Creating model instance
+    if weights is None:
+        mod = PooledOLS.from_formula(formula=formula, data=panel_data)
     else:
-        mod = mod.fit(cov_type=cov)
+        mod = PooledOLS.from_formula(formula=formula, data=panel_data, weights=weights)
+    
+    ## Fitting with desired covariance matrix
+    mod = mod.fit(cov_type='clustered', cluster_entity=True) if cov == 'clustered' else mod.fit(cov_type=cov)
 
+    # Prints summary and returning
     print(mod.summary)
     return mod
 
 
-def first_difference(panel_data, formula, cov="unadjusted"):
+def first_difference(panel_data, formula, weights=None, cov="unadjusted"):
     """
     Fits a standard FD model with the corresponding covariance matrix and WITHOUT an intercept.
     Remember to assign it to an object!
     
     :param panel_data : dataframe (which must be in a panel structure)
     :param formula : patsy formula
+    :param weights : N x 1 Series or vector containing weights to be used in estimation; defaults to None
+        Use is recommended when analyzing survey data, passing on the weight available in the survey
     :param cov : str
         unadjusted: common standard errors
         robust: robust standard errors
         kernel: robust to heteroskedacity AND serial autocorrelation
-        cluster or clustered: clustered standard errors by the entity column
+        clustered: clustered standard errors by the entity column
     """
-
-    ## creating model instance
-    mod = FirstDifferenceOLS.from_formula(formula=formula, data=panel_data)
-    if cov == 'clustered' or cov == 'cluster':
-        mod = mod.fit(cov_type='clustered', cluster_entity=True)
+    ## Creating model instance
+    if weights is None:
+        mod = FirstDifferenceOLS.from_formula(formula=formula, data=panel_data)
     else:
-        mod = mod.fit(cov_type=cov)
+        mod = FirstDifferenceOLS.from_formula(formula=formula, data=panel_data, weights=weights)
+    
+    ## Fitting with desired covariance matrix
+    mod = mod.fit(cov_type='clustered', cluster_entity=True) if cov == 'clustered' else mod.fit(cov_type=cov)
 
     print(mod.summary)
     return mod
 
 
-def fixed_effects(panel_data, formula, time_effects=False, cov="unadjusted"):
+def fixed_effects(panel_data, formula, weights=None, time_effects=False, cov="unadjusted"):
     """
     Fits a standard Fixed Effects model with the corresponding covariance matrix.
     It can be estimated WITH and WITHOUT a constant.
@@ -377,33 +377,35 @@ def fixed_effects(panel_data, formula, time_effects=False, cov="unadjusted"):
 
     :param panel_data : dataframe (which must be in a panel structure)
     :param formula : patsy formula
-    :param time_effects : bool, default to False
+    :param weights : N x 1 Series or vector containing weights to be used in estimation; defaults to None
+        Use is recommended when analyzing survey data, passing on the weight available in the survey
+    :param time_effects : bool, defaults to False
         Whether to include time effects alongside entity effects (and estimate a 2WFE)
     :param cov : str
         unadjusted: common standard errors
         robust: robust standard errors
         kernel: robust to heteroskedacity AND serial autocorrelation
-        cluster or clustered: clustered standard errors by the entity column
+        clustered: clustered standard errors by the entity column
     """
 
-    ## creating model instance
-    if time_effects:
-        formula += ' + EntityEffects + TimeEffects'
-    else:
-        formula += ' + EntityEffects'
+    ## Creating model instance
+    # Defining which effects to control for
+    formula += ' + EntityEffects + TimeEffects' if time_effects else ' + EntityEffects'
 
-    mod = PanelOLS.from_formula(formula=formula, data=panel_data, drop_absorbed=True)
-
-    if cov == 'clustered' or cov == 'cluster':
-        mod = mod.fit(cov_type='clustered', cluster_entity=True)
+    ## Creating model instance
+    if weights is None:
+        mod = PanelOLS.from_formula(formula=formula, data=panel_data, drop_absorbed=True)
     else:
-        mod = mod.fit(cov_type=cov)
+        mod = PanelOLS.from_formula(formula=formula, data=panel_data, drop_absorbed=True, weights=weights)
+
+    ## Fitting with desired covariance matrix
+    mod = mod.fit(cov_type='clustered', cluster_entity=True) if cov == 'clustered' else mod.fit(cov_type=cov)
 
     print(mod.summary)
     return mod
 
 
-def random_effects(panel_data, formula, cov="unadjusted"):
+def random_effects(panel_data, formula, weights=None, cov="unadjusted"):
     """
     Fits a standard Random Effects model with the corresponding covariance matrix.
     It can be estimated WITH and WITHOUT a constant.
@@ -413,32 +415,37 @@ def random_effects(panel_data, formula, cov="unadjusted"):
 
     :param panel_data : dataframe (which must be in a panel structure)
     :param formula : patsy formula
+    :param weights : N x 1 Series or vector containing weights to be used in estimation; defaults to None
+        Use is recommended when analyzing survey data, passing on the weight available in the survey
     :param cov : str
         unadjusted: common standard errors
         robust: robust standard errors
         kernel: robust to heteroskedacity AND serial autocorrelation
-        cluster or clustered: clustered standard errors by the entity column
+        clustered: clustered standard errors by the entity column
     """
 
-    ## creating model instance
-    mod = RandomEffects.from_formula(formula=formula, data=panel_data)
-
-    if cov == 'clustered' or cov == 'cluster':
-        mod = mod.fit(cov_type='clustered', cluster_entity=True)
+    ## Creating model instance
+    if weights is None:
+        mod = RandomEffects.from_formula(formula=formula, data=panel_data)
     else:
-        mod = mod.fit(cov_type=cov)
+        mod = RandomEffects.from_formula(formula=formula, data=panel_data, weights=weights)
+
+    ## Fitting with desired covariance matrix
+    mod = mod.fit(cov_type='clustered', cluster_entity=True) if cov == 'clustered' else mod.fit(cov_type=cov)
 
     print(mod.summary)
     return mod
 
 
-def hausman_fe_re(panel_data, inef_formula, cov="unadjusted", level=0.05):
+def hausman_fe_re(panel_data, inef_formula, weights=None, cov="unadjusted", level=0.05):
     """
     Executes a Hausman test, which H0: there is not correlation between unobserved effects and the independent variables
     It is not necessary to assign the function to an object!
 
     :param panel_data : dataframe (which must be in a panel structure)
     :param inef_formula : patsy formula for the inefficient model under H0 (fixed effects)
+    :param weights : N x 1 Series or vector containing weights to be used in estimation; defaults to None
+        Use is recommended when analyzing survey data, passing on the weight available in the survey
     :param cov : str
         unadjusted: common standard errors
         robust: robust standard errors
@@ -447,14 +454,21 @@ def hausman_fe_re(panel_data, inef_formula, cov="unadjusted", level=0.05):
     """
 
     ## Random Effects
-    random = RandomEffects.from_formula(formula=inef_formula, data=panel_data).fit(cov_type=cov)
+    if weights is None:
+        random = RandomEffects.from_formula(formula=inef_formula, data=panel_data).fit(cov_type=cov)
+    else:
+        random = RandomEffects.from_formula(formula=inef_formula, data=panel_data, weights=weights).fit(cov_type=cov)
 
     ## Fixed Effects
     formula_fe = inef_formula + ' + EntityEffects'
-    fixed = PanelOLS.from_formula(formula=formula_fe, data=panel_data, drop_absorbed=True).fit(cov_type=cov)
+    if weights is None:
+        fixed = PanelOLS.from_formula(formula=formula_fe, data=panel_data, drop_absorbed=True).fit(cov_type=cov)
+    else:
+        fixed = PanelOLS.from_formula(formula=formula_fe, data=panel_data,
+                                      drop_absorbed=True, weights=weights).fit(cov_type=cov)
 
     ## Computing the Hausman statistic
-    # difference between the assyntotic variance
+    # difference between the asymptotic variance
     var_assin = fixed.cov - random.cov
     # difference between parameters
     d = fixed.params - random.params
@@ -467,18 +481,14 @@ def hausman_fe_re(panel_data, inef_formula, cov="unadjusted", level=0.05):
     p = stats.chi2(freedom).sf(H)
 
     if p < level:
-        print(f"""
-        The value of H is {round(H, 6)} with {freedom} degrees of freedoom in the chi-squared distribution.
-        The p-value of the test is {round(p, 6)} and, therefore, H0 is REJECTED and fixed effects is preferable.
-        """)
+        print(f"The value of H is {round(H, 6)} with {freedom} degrees of freedom in the chi-squared distribution.")
+        print(f"The p-value of the test is {round(p, 6)} and, therefore, H0 is REJECTED and fixed effects is preferred")
     else:
-        print(f"""
-        The value of H is {round(H, 6)} with {freedom} degrees of freedoom in the chi-squared distribution.
-        The p-value of the test is {round(p, 6)} and, therefore, H0 is NOT REJECTED and random effects is preferable.
-        """)
+        print(f"The value of H is {round(H, 6)} with {freedom} degrees of freedom in the chi-squared distribution.")
+        print(f"The p-value of the test is {round(p, 6)} and H0 is NOT REJECTED and random effects is preferred.")
 
 
-def iv_2sls(data, formula, cov="unadjusted"):
+def iv_2sls(data, formula, weights=None, cov="unadjusted"):
     """
     Fits a 2SLS model with the corresponding covariance matrix.
     The endogenous terms can be formulated using the following syntax:
@@ -489,41 +499,41 @@ def iv_2sls(data, formula, cov="unadjusted"):
     :param formula : patsy formula
         The endogenous terms can be formulated using the following syntax:
         lwage ~ 1 + [educ ~ psem + educ_married] + age + agesq
+    :param weights : N x 1 Series or vector containing weights to be used in estimation; defaults to None
+        Use is recommended when analyzing survey data, passing on the weight available in the survey
     :param cov : str
         unadjusted: common standard errors
         robust: robust standard errors
         kernel: robust to heteroskedacity AND serial autocorrelation
-        cluster or clustered: clustered standard errors by the entity column
+        clustered: clustered standard errors by the entity column
     """
 
-    # creating and fitting the model
-    if cov == "cluster" or cov == "clustered":
-        try:
-            mod = IV2SLS.from_formula(formula=formula, data=data).fit(cov_type='clustered', cluster_entity=True)
-        except Exception:
-            erro = "It was not possible to find the selected group. Try again!"
-            return erro
+    ## Creating model instance
+    if weights is None:
+        mod = IV2SLS.from_formula(formula=formula, data=data)
     else:
-        mod = IV2SLS.from_formula(formula=formula, data=data).fit(cov_type=cov)
+        mod = IV2SLS.from_formula(formula=formula, data=data, weights=weights)
+    
+    ## Fitting with desired covariance matrix
+    mod = mod.fit(cov_type='clustered', cluster_entity=True) if cov == 'clustered' else mod.fit(cov_type=cov)
 
-    ## printing the summary
+    ## Summary
     print(mod.summary)
-    # printing helpful information
-    print("In order to see first stage results (and check if the instruments are relevant with the 'Partial P-Value'), "
-          "call 'mod.first_stage'.")
-    print("To check if the instrumentated variable is exogenous, call 'mod.wooldridge_regression' or "
-          "'mod.wooldridge_regression'.")
-    print("To test for the instruments exogeneity (when they are more numerous than the number of endogenous variables "
-          "- therefore, are overidentified restrictions), call 'mod.wooldridge_overid' (Ho: instruments are exogenous)")
 
-    ## returning the object
+    # Helpful information
+    print("To see 1st stage results (and if the instruments are relevant with Partial P-Value), call 'mod.first_stage")
+    print("To check if the instrumentated variable is exogenous, call 'mod.wooldridge_regression'.")
+    print("To test for the instruments exogeneity (when they are more numerous than the number of endogenous variables")
+    print("- therefore, are overidentified restrictions), call 'mod.wooldridge_overid' (Ho: instruments are exogenous)")
+
+    ## Returning the object
     return mod
 
 
-####################################### Variáveis Dependentes Discretas e Seleção Amostral #############################
-## MISSING: Heckit, Tobit and discontinous/censored regressions
+####################################### Discrete Dependent Variables and Selection Bias #############################
+## MISSING: Heckit, Tobit and discontinuous/censored regressions
 ## Heckman procedures for sample correction can be imported from the Heckman.py file
-# Alternatively, these models can be used in R, as examplified in the file 'Tobit_Heckman.R'
+# Alternatively, these models can be used in R, as exemplified in the file 'Tobit_Heckman.R'
 
 def probit_logit(formula, data, model=probit, cov='normal'):
     """
@@ -544,11 +554,11 @@ def probit_logit(formula, data, model=probit, cov='normal'):
     if cov == "robust":
         mod = model(formula, data).fit(use_t=True, cov_type='HC1')
     elif cov == "cluster" or cov == "clustered":
-        group = str(input("Qual o rótulo da coluna de grupo?"))
+        group = str(input("What is the group column?"))
         try:
             mod = model(formula, data).fit(use_t=True, cov_type='cluster', cov_kwds={'groups': data[group]})
         except Exception:
-            erro = "Não foi possível encontrar o grupo selecionado. Tente novamente!"
+            erro = "It was not possible to find the desired group. Check the spelling and the data and try again!"
             return erro
     else:
         mod = model(formula, data).fit(use_t=True)
@@ -566,9 +576,10 @@ def probit_logit(formula, data, model=probit, cov='normal'):
     print(
         "\nFor discrete variables, create a list of the values which you want to test and compute " +
         "'mod.model.cdf(sum(map(lambda x, y: x * y, list(mod.params), values)))")
+    print("To predict values using the CDF, use mod.predict(X). X can be blank (use values from the dataset")
+    print("or a K x N Dimensional array, where K = number of variables and N = number of observations.")
 
     return mod
-
 
 def poisson_reg(formula, data, cov='normal'):
     """
@@ -587,11 +598,11 @@ def poisson_reg(formula, data, cov='normal'):
     if cov == "robust":
         mod = poisson(formula, data).fit(use_t=True, cov_type='HC1')
     elif cov == "cluster" or cov == "clustered":
-        group = str(input("Qual o rótulo da coluna de grupo?"))
+        group = str(input("What is the group column?"))
         try:
             mod = poisson(formula, data).fit(use_t=True, cov_type='cluster', cov_kwds={'groups': data[group]})
         except Exception:
-            erro = "Não foi possível encontrar o grupo selecionado. Tente novamente!"
+            erro = "It was not possible to find the desired group. Check the spelling and the data and try again!"
             return erro
     else:
         mod = poisson(formula, data).fit(use_t=True)
@@ -608,12 +619,17 @@ def poisson_reg(formula, data, cov='normal'):
         f"The coefficient to determine over/underdispersion is σ = {sigma}, " +
         f"which must be close to one for standard errors to be valid. " +
         f"If not, they must be multiplied by {sigma}.")
-    print("\n##############################################################################\n")
+
+    print("##############################################################################")
+    
     print(mfx.summary())
     print(
         "\nMarginal effects on certain values can be found using 'mod.get_margeff(atexog = values).summary()', " +
         "where values must be generated using:\nvalues = dict(zip(range(1,n), values.tolist())).update({0:1})")
     print(
         "\nUsually, the wanted effect of the poisson coefficients is it's semi-elasticity, which is 100*[exp(ß) - 1].")
+
+    print("To predict values using the CDF, use mod.predict(X). X can be blank (use values from the dataset")
+    print("or a K x N Dimensional array, where K = number of variables and N = number of observations.")
 
     return mod

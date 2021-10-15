@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="Better code formatting.">
+      <change beforePath="$PROJECT_DIR$/Notebooks/Aula 9 - Parcialidade e Viés RLM.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Notebooks/Cap 13 e 14 - Dados em Painel.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Notebooks/Chow Test.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Notebooks/Heteroscedasticidade &amp; Forma Funcional.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Notebooks/Sazonalidade_Simples.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Notebooks/econometric_functions_example.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datasets/wage2.RData" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/wage2.RData" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/econometric_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/econometric_functions.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1wBj9ywjLxJykvqcfENwrUGXmD5" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
+      <module name="Econometria" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="" />
+      <created>1627938729923</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1627938729923</updated>
+      <workItem from="1627938741475" duration="162000" />
+      <workItem from="1627938914253" duration="162000" />
+      <workItem from="1627939181035" duration="192000" />
+      <workItem from="1628017307649" duration="598000" />
+      <workItem from="1628122478891" duration="1472000" />
+      <workItem from="1628124497099" duration="32000" />
+      <workItem from="1628354351940" duration="310000" />
+      <workItem from="1632606664286" duration="458000" />
+      <workItem from="1634222845866" duration="49000" />
+      <workItem from="1634222925043" duration="109000" />
+      <workItem from="1634328465169" duration="578000" />
+    </task>
+    <task id="LOCAL-00001" summary="Better code formatting.">
+      <created>1632607000801</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1632607000801</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Better code formatting." />
+    <option name="LAST_COMMIT_MESSAGE" value="Better code formatting." />
+  </component>
+</project>

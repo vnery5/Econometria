@@ -4,14 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="Better code formatting.">
-      <change beforePath="$PROJECT_DIR$/Notebooks/Aula 9 - Parcialidade e Viés RLM.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Notebooks/Cap 13 e 14 - Dados em Painel.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Notebooks/Chow Test.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Notebooks/Heteroscedasticidade &amp; Forma Funcional.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Notebooks/Sazonalidade_Simples.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Notebooks/econometric_functions_example.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/datasets/wage2.RData" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/wage2.RData" afterDir="false" />
+    <list default="true" id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="Lots of changes:&#10;&#10;- Added weights option in panel and IV2LS models&#10;- Fixed print identation&#10;- Corrected typos">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/econometric_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/econometric_functions.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -80,7 +74,8 @@
       <workItem from="1632606664286" duration="458000" />
       <workItem from="1634222845866" duration="49000" />
       <workItem from="1634222925043" duration="109000" />
-      <workItem from="1634328465169" duration="578000" />
+      <workItem from="1634328465169" duration="957000" />
+      <workItem from="1634662777304" duration="355000" />
     </task>
     <task id="LOCAL-00001" summary="Better code formatting.">
       <created>1632607000801</created>
@@ -89,7 +84,21 @@
       <option name="project" value="LOCAL" />
       <updated>1632607000801</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Removed notebooks folder (now they are in the main directory) and added some panel examples from Wooldridge's book.">
+      <created>1634329139269</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1634329139269</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Lots of changes:&#10;&#10;- Added weights option in panel and IV2LS models&#10;- Fixed print identation&#10;- Corrected typos">
+      <created>1634329231898</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1634329231898</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -109,6 +118,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Better code formatting." />
-    <option name="LAST_COMMIT_MESSAGE" value="Better code formatting." />
+    <MESSAGE value="Removed notebooks folder (now they are in the main directory) and added some panel examples from Wooldridge's book." />
+    <MESSAGE value="Lots of changes:&#10;&#10;- Added weights option in panel and IV2LS models&#10;- Fixed print identation&#10;- Corrected typos" />
+    <option name="LAST_COMMIT_MESSAGE" value="Lots of changes:&#10;&#10;- Added weights option in panel and IV2LS models&#10;- Fixed print identation&#10;- Corrected typos" />
   </component>
 </project>

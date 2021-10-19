@@ -1,12 +1,13 @@
 """
-Functions that will do most of the basic econometric regression models and tests.
-Based on the seminal book of Introduction to Econometrics by Jeffrey Wooldridge.
-Author: Vinícius de Almeida Nery Ferreira (ECO - UnB)
+Functions that will do most of the basic econometric regression and panel models and tests.
+Based mainly on the seminal book of Introduction to Econometrics by Jeffrey Wooldridge (6th edition).
+Author: Vinícius de Almeida Nery Ferreira (FACE/ECO - University of Brasília (UnB))
 E-mail: vnery5@gmail.com
 Github: https://github.com/vnery5/Econometria
 """
 
-## Importing
+####################################### Imports #################################################################
+# Basics
 import pandas as pd
 import numpy as np
 
@@ -14,9 +15,12 @@ import numpy as np
 import statsmodels.api as sm
 from scipy import stats
 from statsmodels.stats.diagnostic import het_breuschpagan, linear_reset
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+import statsmodels.stats.api as sms
 
 # Patsy formulas
 from statsmodels.formula.api import logit, probit, poisson, ols
+from patsy import dmatrices
 
 # Panel and IV regressions
 from linearmodels import PanelOLS, FirstDifferenceOLS, PooledOLS, RandomEffects
@@ -31,19 +35,15 @@ import seaborn as sns
 import plotly.express as px
 import plotly.graph_objects as go
 
-# Cute tables
-from statsmodels.iolib.summary2 import summary_col
-from stargazer.stargazer import Stargazer
-
 # General
 import os
 import pathlib
 import glob
 from IPython.display import clear_output
-import gc
+
 
 ####################################### Functions ###############################################################
-####################################### .dta Data Collection ###########################################################
+####################################### .dta Data Collection ####################################################
 def get_data_stata(name=""):
     """
     Reads STATA (.dta) archives; the extension is not necessary.
@@ -94,7 +94,7 @@ def get_data_stata(name=""):
                 print("Check the file name (without the extension) and if it is in the same directory as this program!")
 
 
-####################################### Continuous Dependent Variables ##############################################
+####################################### Continuous Dependent Variables ##########################################
 def ols_reg(formula, data, cov='unadjusted'):
     """
     Fits a standard OLS model with the corresponding covariance matrix.
@@ -213,35 +213,103 @@ def heteroscedascity_test(model, formula, data, level=0.05):
     f_test(H0=h0_white, model=mod_white, level=level)
 
 
-def reset_ols(formula, data, cov='normal', level=0.05):
+def ols_diagnostics(formula, model, data, y_string):
     """
-    Executes a RESET test for a OLS model specification, where H0: model is well specified
-    It is not necessary to assign the function to an object!
-
-    :param formula : patsy formula
-    :param data : dataframe
-    :param cov : str
-        normal: common standard errors
-        robust: HC1 standard errors
-    :param level : significance level (default 5%)
+    Given the OLS model supplied, calculates statistics and draws graphs that check 4 of the 6 multiple linear
+    regressions hypothesis. Tests done: Harvey-Collier, Variance Influence Factor, RESET, Breusch-Pagan, Jarque-Bera.
+    References:
+        https://www.statsmodels.org/dev/examples/notebooks/generated/regression_diagnostics.html
+        https://medium.com/@vince.shields913/regression-diagnostics-fa476b2f64db
+    :param formula : patsy formula of the model;
+    :param model : fitted model object;
+    :param data : DataFrame containing the data; 
+    :param y_string : string (name) of the dependent variable
     """
-    ## getting covariance type
-    if cov == 'normal':
-        cov_type = 'nonrobust'
-    else:
-        cov_type = 'HC1'
 
-    ## OLS model 
-    mod = ols(formula=formula, data=data).fit(use_t=True, cov_type=cov_type)
+    ## Harvey-Collier: linearity (MLR 1)
+    try:
+        print(f"Harvey-Collier P-value for linearity (MLR 1): {round(sms.linear_harvey_collier(model)[1], 4)}")
+        print("H0: Model is linear.")
+        print("For more information, see the 'Residuals vs Fitted Values' plot.\n")
+    except ValueError:
+        print("For information on linearity (MLR 1),  see the 'Residuals vs Fitted Values' plot.\n")
 
-    ## executing test
-    test = linear_reset(mod, power=3, use_f=False, cov_type=cov_type)
-    if test.pvalue < level:
-        print(f"The test's p-value is equal to {np.around(test.pvalue, 6)} < {level * 100}%")
-        print("Therefore, Ho is rejected (the model is badly specified).")
-    else:
-        print(f"The test's p-value is equal to {np.around(test.pvalue, 6)} > {level * 100}%")
-        print("Therefore, Ho is NOT rejected (the model is not badly specified).")
+    ### Condition number: multicollinearity (MLR 3)
+    print(f"Condition Number for Multicollinearity (MLR 3): {round(np.linalg.cond(model.model.exog), 2)}")
+    print("The larger the number, the bigger the multicollinearity. For more information, see the 'VIF' plot.\n")
+
+    ## Calculating Variance Influence Factors (VIF)
+    # Matrices
+    y, X = dmatrices(formula, data, return_type='dataframe')
+
+    ## Calculating VIFs and storing in a DataFrame
+    dfVIF = pd.DataFrame()
+    dfVIF["Variables"] = X.columns
+    dfVIF["VIF_Factor"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
+
+    ## Reset: specification/conditional mean of residuals is 0 (MLR 4)
+    reset = linear_reset(model, power=3, use_f=True, cov_type='HC1')
+    print(f"Linear Reset P-value (MLR 4): {np.around(reset.pvalue, 6)}")
+    print("H0: model is well specificed.\n")
+
+    ## Breusch-Pagan (MLR 5):
+    breusch_pagan_pvalue = np.around(sms.het_breuschpagan(model.resid, model.model.exog)[3], 4)
+    print(f"Breusch-Pagan P-value for heteroskedasticity (MLR 5): {breusch_pagan_pvalue}")
+    print("H0: Variance is homoskedasticity.")
+    print("For White's test and use in panel models, call the 'heteroscedascity_test' function.")
+    print("For more information, see the 'Scale-Location' plot.\n")
+
+    ## Jarque-Bera: normality of the residuals (MLR 6, used for statistic inference)
+    print(f"Jarque-Bera P-value (MLR 6): {np.around(sms.jarque_bera(model.resid)[1], 4)}")
+    print("H0: Data has a normal distribution.")
+    print("For more information, see the 'Normal Q-Q' plot.\n")
+
+    ## Creating graphic object
+    fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(12, 12))
+    plt.style.use('seaborn-white')
+
+    ### Plots
+    ## Linearity: residuals x predicted values. The less inclined the lowess, the more linear the model.
+    ax00 = sns.residplot(x=model.fittedvalues, y=y_string, data=data, lowess=True,
+                         scatter_kws={'facecolors': 'none', 'edgecolors': 'black'},
+                         line_kws={'color': 'blue', 'lw': 1, 'alpha': 0.8}, ax=ax[0, 0])
+    
+    # Titles
+    ax00.set_title('Lineary: Residuals vs Fitted', fontsize=12)
+    ax00.set_xlabel('Fitted Values', fontsize=10)
+    ax00.set_ylabel('Residuals (horizontal lowess: linearity)', fontsize=10)
+
+    ## Multicollinearity: VIF
+    ax01 = dfVIF["VIF_Factor"].plot(kind='bar', stacked=False, ax=ax[0, 1])
+
+    # X tick labels
+    ax01.set_xticklabels(labels=dfVIF["Variables"], rotation=0, color='k')
+
+    # Annotations
+    for p in ax01.patches:                 
+        ax01.annotate(round(p.get_height(), 2), (p.get_x()+p.get_width()/2., p.get_height()), 
+                      ha='center', va='center', xytext=(0, 10), textcoords='offset points')
+
+    ## Titles
+    ax01.set_title("Multicollinearity Test - VIF", color='k', fontsize=12)
+    ax01.set_ylabel("Variance Influence Factor (> 5: multicollinearity)", color='k', fontsize=10)
+    ax01.set_xlabel("Variable", color='k', fontsize=10)
+
+    ## Heteroskedasticity: the more disperse and horizontal the points,
+    # the more likely it is that homoskedasticity is present
+    ax10 = sns.regplot(x=model.fittedvalues, y=np.sqrt(np.abs(model.get_influence().resid_studentized_internal)), 
+                       scatter=True, ci=False,  lowess=True, line_kws={'color': 'blue', 'lw': 1, 'alpha': 0.8},
+                       scatter_kws={'facecolors': 'none', 'edgecolors': 'black'}, ax=ax[1, 0])
+
+    # Titles
+    ax10.set_title('Heteroskedasticity: Scale-Location', fontsize=12)
+    ax10.set_xlabel('Fitted Values', fontsize=10)
+    ax10.set_ylabel('$\sqrt{|Standardized Residuals|}$ (disperse and horizontal: homoskedasticity)', fontsize=10)
+
+    ## Normality of the residuals: Q-Q Plot
+    probplot = sm.ProbPlot(model.get_influence().resid_studentized_internal, fit=True)
+    ax11 = probplot.qqplot(line='45', marker='o', color='black', ax=ax[1, 1])
+    # ax11.set_title('Normality of the Residuals: Normal Q-Q Plot', fontsize=12)
 
 
 def j_davidson_mackinnon_ols(formula1, formula2, data, cov='normal', level=0.05):
@@ -288,7 +356,47 @@ def j_davidson_mackinnon_ols(formula1, formula2, data, cov='normal', level=0.05)
         print("Therefore, Ho is rejected (model 1 is better specified).")
 
 
-####################################### Panel Models (linearmodels) ##########################################
+def cooks_distance_outlier_influence(model):
+    """
+    Calculates and plots the Cooks Distance metric, which shows the influence of individual points
+    (dependent and independent variables) in the regression results.
+    If a point is above D = 0.5, then it affects the regression results.
+    High leverage: extreme X value; outlier: extreme y value.
+    References:
+        https://medium.com/@vince.shields913/regression-diagnostics-fa476b2f64db
+        https://www.sthda.com/english/articles/39-regression-model-diagnostics/161-linear-regression-assumptions-and-diagnostics-in-r-essentials/
+    :param model: fitted OLS model object.
+    """
+
+    ## Defining theme
+    plt.style.use('seaborn-white')
+
+    ## Creating functions that define D = 0.5 and D = 1.0
+    def one_line(x):
+        return np.sqrt((1 * len(model.params) * (1 - x)) / x)
+
+    def point_five_line(x):
+        return np.sqrt((0.5 * len(model.params) * (1 - x)) / x)
+    
+    def show_cooks_distance_lines(tx, inc, color, label):
+        plt.plot(inc, tx(inc), label=label, color=color, ls='--')
+    
+    ## Plotting
+    sns.regplot(x=model.get_influence().hat_matrix_diag, y=model.get_influence().resid_studentized_internal, 
+                scatter=True, ci=False, lowess=True, line_kws={'color': 'blue', 'lw': 1, 'alpha': 0.8},
+                scatter_kws={'facecolors': 'none', 'edgecolors': 'black'})
+    
+    show_cooks_distance_lines(one_line, np.linspace(.01, .14, 100), 'red', 'Cooks Distance (D=1)')
+
+    show_cooks_distance_lines(point_five_line, np.linspace(.01, .14, 100), 'black', 'Cooks Distance (D=0.5)')
+
+    plt.title('Residuals vs Leverage', fontsize=12)
+    plt.xlabel('Leverage', fontsize=10)
+    plt.ylabel('Standardized Residuals', fontsize=10)
+    plt.legend()
+
+
+####################################### Panel Models (linearmodels) #############################################
 def panel_structure(data, entity_column, time_column):
     """
     Takes a dataframe and creates a panel structure.
@@ -530,7 +638,7 @@ def iv_2sls(data, formula, weights=None, cov="unadjusted"):
     return mod
 
 
-####################################### Discrete Dependent Variables and Selection Bias #############################
+####################################### Discrete Dependent Variables and Selection Bias #########################
 ## MISSING: Heckit, Tobit and discontinuous/censored regressions
 ## Heckman procedures for sample correction can be imported from the Heckman.py file
 # Alternatively, these models can be used in R, as exemplified in the file 'Tobit_Heckman.R'

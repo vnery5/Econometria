@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="Lots of changes:&#10;&#10;- Added weights option in panel and IV2LS models&#10;- Fixed print identation&#10;- Corrected typos">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/econometric_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/econometric_functions.py" afterDir="false" />
-    </list>
+    <list default="true" id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="Added OLS Diagnostics and Cooks Distance for high leverage/outlier data points." />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -75,7 +72,7 @@
       <workItem from="1634222845866" duration="49000" />
       <workItem from="1634222925043" duration="109000" />
       <workItem from="1634328465169" duration="957000" />
-      <workItem from="1634662777304" duration="355000" />
+      <workItem from="1634662777304" duration="460000" />
     </task>
     <task id="LOCAL-00001" summary="Better code formatting.">
       <created>1632607000801</created>
@@ -98,7 +95,14 @@
       <option name="project" value="LOCAL" />
       <updated>1634329231898</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Added OLS Diagnostics and Cooks Distance for high leverage/outlier data points.">
+      <created>1634663189640</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1634663189640</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -120,6 +124,7 @@
     <MESSAGE value="Better code formatting." />
     <MESSAGE value="Removed notebooks folder (now they are in the main directory) and added some panel examples from Wooldridge's book." />
     <MESSAGE value="Lots of changes:&#10;&#10;- Added weights option in panel and IV2LS models&#10;- Fixed print identation&#10;- Corrected typos" />
-    <option name="LAST_COMMIT_MESSAGE" value="Lots of changes:&#10;&#10;- Added weights option in panel and IV2LS models&#10;- Fixed print identation&#10;- Corrected typos" />
+    <MESSAGE value="Added OLS Diagnostics and Cooks Distance for high leverage/outlier data points." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added OLS Diagnostics and Cooks Distance for high leverage/outlier data points." />
   </component>
 </project>

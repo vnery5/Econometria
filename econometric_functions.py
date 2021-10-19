@@ -234,6 +234,12 @@ def ols_diagnostics(formula, model, data, y_string):
     except ValueError:
         print("For information on linearity (MLR 1),  see the 'Residuals vs Fitted Values' plot.\n")
 
+    ## Reset: specification of tue functional form of the model the model
+    reset = linear_reset(model, power=3, use_f=True, cov_type='HC1')
+    print(f"Linear Reset (MLR 1) P-value: {reset.pvalue}")
+    print("H0: model is well specified and linear.")
+    print("For more information, see the Residuals vs Fitted Values plot.\n")
+
     ### Condition number: multicollinearity (MLR 3)
     print(f"Condition Number for Multicollinearity (MLR 3): {round(np.linalg.cond(model.model.exog), 2)}")
     print("The larger the number, the bigger the multicollinearity. For more information, see the 'VIF' plot.\n")
@@ -247,11 +253,6 @@ def ols_diagnostics(formula, model, data, y_string):
     dfVIF["Variables"] = X.columns
     dfVIF["VIF_Factor"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
 
-    ## Reset: specification/conditional mean of residuals is 0 (MLR 4)
-    reset = linear_reset(model, power=3, use_f=True, cov_type='HC1')
-    print(f"Linear Reset P-value (MLR 4): {np.around(reset.pvalue, 6)}")
-    print("H0: model is well specificed.\n")
-
     ## Breusch-Pagan (MLR 5):
     breusch_pagan_pvalue = np.around(sms.het_breuschpagan(model.resid, model.model.exog)[3], 4)
     print(f"Breusch-Pagan P-value for heteroskedasticity (MLR 5): {breusch_pagan_pvalue}")
@@ -259,10 +260,19 @@ def ols_diagnostics(formula, model, data, y_string):
     print("For White's test and use in panel models, call the 'heteroscedascity_test' function.")
     print("For more information, see the 'Scale-Location' plot.\n")
 
+    ## Durbin-Watson: correlation between the residuals
+    print(f"Durbin-Watson statistic for residual correlation is: {np.around(durbin_watson(model.resid), 2)}")
+    print("If the value is close to 0, there is positive serial correlation.")
+    print("If the value is close to 4, there is negative serial correlation.")
+    print("Rule of thumb: 1.5 < DW < 2.5 indicates no serial correlation.\n")
+
     ## Jarque-Bera: normality of the residuals (MLR 6, used for statistic inference)
     print(f"Jarque-Bera P-value (MLR 6): {np.around(sms.jarque_bera(model.resid)[1], 4)}")
     print("H0: Data has a normal distribution.")
     print("For more information, see the 'Normal Q-Q' plot.\n")
+
+    print("To test for exogeneity (MLR 4), an IV2SLS must be constructed.")
+    print("Test for random sampling (Heckit) are not yet available in this module.")
 
     ## Creating graphic object
     fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(12, 12))
@@ -275,7 +285,7 @@ def ols_diagnostics(formula, model, data, y_string):
                          line_kws={'color': 'blue', 'lw': 1, 'alpha': 0.8}, ax=ax[0, 0])
     
     # Titles
-    ax00.set_title('Lineary: Residuals vs Fitted', fontsize=12)
+    ax00.set_title('Linearity: Residuals vs Fitted', fontsize=12)
     ax00.set_xlabel('Fitted Values', fontsize=10)
     ax00.set_ylabel('Residuals (horizontal lowess: linearity)', fontsize=10)
 
@@ -420,7 +430,7 @@ def panel_structure(data, entity_column, time_column):
 def pooled_ols(panel_data, formula, weights=None, cov="unadjusted"):
     """
     Fits a standard Pooled OLS model with the corresponding covariance matrix.
-    Remember to include a intercept in the formula and to assign it to an object!
+    Remember to include a intercept in the formula ('1 + ...') and to assign it to an object!
 
     :param panel_data : dataframe (which must be in a panel structure)
     :param formula : patsy formula
@@ -481,7 +491,7 @@ def fixed_effects(panel_data, formula, weights=None, time_effects=False, cov="un
     It can be estimated WITH and WITHOUT a constant.
     It is preferred when the unobserved effects are correlated with the error term
     and, therefore, CAN'T estimate constant terms.
-    Remember to assign it to an object!
+    Remember to include a intercept in the formula ('1 + ...') and to assign it to an object!
 
     :param panel_data : dataframe (which must be in a panel structure)
     :param formula : patsy formula
@@ -519,7 +529,7 @@ def random_effects(panel_data, formula, weights=None, cov="unadjusted"):
     It can be estimated WITH and WITHOUT a constant.
     It is preferred when the unobserved effects aren't correlated with the error term
     and, therefore, CAN estimate constant terms.
-    Remember to assign it to an object!
+    Remember to include a intercept in the formula ('1 + ...') and to assign it to an object!
 
     :param panel_data : dataframe (which must be in a panel structure)
     :param formula : patsy formula
@@ -548,7 +558,7 @@ def random_effects(panel_data, formula, weights=None, cov="unadjusted"):
 def hausman_fe_re(panel_data, inef_formula, weights=None, cov="unadjusted", level=0.05):
     """
     Executes a Hausman test, which H0: there is not correlation between unobserved effects and the independent variables
-    It is not necessary to assign the function to an object!
+    It is not necessary to assign the function to an object! But remember to include a intercept in the formulas.
 
     :param panel_data : dataframe (which must be in a panel structure)
     :param inef_formula : patsy formula for the inefficient model under H0 (fixed effects)
@@ -596,17 +606,14 @@ def hausman_fe_re(panel_data, inef_formula, weights=None, cov="unadjusted", leve
         print(f"The p-value of the test is {round(p, 6)} and H0 is NOT REJECTED and random effects is preferred.")
 
 
-def iv_2sls(data, formula, weights=None, cov="unadjusted"):
+def iv_2sls(data, formula, weights=None, cov="robust"):
     """
     Fits a 2SLS model with the corresponding covariance matrix.
-    The endogenous terms can be formulated using the following syntax:
-        lwage ~ 1 + [educ ~ psem + educ_married] + age + agesq
-    Remember to use mod = iv_2sls(...)!
+    The endogenous terms can be formulated using the following syntax: lwage ~ 1 + [educ ~ psem + educ_married] + age...
+    Remember to include a intercept in the formula ('1 + ...') and to assign it to an object!
 
     :param data : dataframe
-    :param formula : patsy formula
-        The endogenous terms can be formulated using the following syntax:
-        lwage ~ 1 + [educ ~ psem + educ_married] + age + agesq
+    :param formula : patsy formula ('lwage ~ 1 + [educ ~ psem + educ_married] + age + agesq...')
     :param weights : N x 1 Series or vector containing weights to be used in estimation; defaults to None
         Use is recommended when analyzing survey data, passing on the weight available in the survey
     :param cov : str

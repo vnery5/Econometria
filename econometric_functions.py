@@ -1,13 +1,16 @@
 """
 Functions that will do most of the basic econometric regression and panel models and tests.
+
 Based mainly on the seminal book of Introduction to Econometrics by Jeffrey Wooldridge (6th edition).
-Author: Vinícius de Almeida Nery Ferreira (FACE/ECO - University of Brasília (UnB))
+
+Author: Vinícius de Almeida Nery Ferreira (FACE/ECO - University of Brasília (UnB)).
+
 E-mail: vnery5@gmail.com
+
 Github: https://github.com/vnery5/Econometria
 """
 
 ####################################### Imports #################################################################
-# Basics
 import pandas as pd
 import numpy as np
 

@@ -107,6 +107,7 @@ def ols_reg(formula, data, cov='unadjusted'):
         unadjusted: common standard errors
         robust: HC1 standard errors
         cluster or clustered: clustered standard errors (must specify group)
+    :return : statsmodels model instance
     """
 
     # creating and fitting the model
@@ -319,7 +320,6 @@ def ols_diagnostics(formula, model, data, y_string):
     ## Normality of the residuals: Q-Q Plot
     probplot = sm.ProbPlot(model.get_influence().resid_studentized_internal, fit=True)
     ax11 = probplot.qqplot(line='45', marker='o', color='black', ax=ax[1, 1])
-    # ax11.set_title('Normality of the Residuals: Normal Q-Q Plot', fontsize=12)
 
 
 def j_davidson_mackinnon_ols(formula1, formula2, data, cov='normal', level=0.05):
@@ -407,6 +407,26 @@ def cooks_distance_outlier_influence(model):
 
 
 ####################################### Panel Models (linearmodels) #############################################
+def xtdescribe_panel(data, entity_column):
+    """
+    Calculates the total appearances for each individual and checks how balanced the dataset is.
+
+    :param data : dataframe
+    :param entity_column : str, column that represents the individuals (what would be the 1st level index)
+        Important: must be called BEFORE panel_structure
+
+    :return : modified dataset with appearance column and prints how balanced the panel is
+    """
+
+    ## Number of appearances of each individual and adding as a column to the dataset
+    data["number_appearances"] = data.groupby(entity_column)[entity_column].transform('count')
+    
+    ## Printing xtdescribe
+    print(data.drop_duplicates(subset=[entity_column], keep='first')["number_appearances"].value_counts(normalize=True))
+
+    return data
+
+
 def panel_structure(data, entity_column, time_column):
     """
     Takes a dataframe and creates a panel structure.
@@ -414,6 +434,8 @@ def panel_structure(data, entity_column, time_column):
     :param data : dataframe
     :param entity_column : str, column that represents the individuals (1st level index)
     :param time_column : str, column that represents the time periods (2nd level index)
+
+    :return : modified DataFrame with the panel structure
     """
 
     ## Creating MultiIndex and maintains columns in the DataFrame
@@ -441,6 +463,7 @@ def pooled_ols(panel_data, formula, weights=None, cov="unadjusted"):
         robust: robust standard errors
         kernel: robust to heteroskedacity AND serial autocorrelation
         clustered: clustered standard errors by the entity column
+    :return : linearmodels model instance
     """
 
     ## Creating model instance
@@ -471,6 +494,7 @@ def first_difference(panel_data, formula, weights=None, cov="unadjusted"):
         robust: robust standard errors
         kernel: robust to heteroskedacity AND serial autocorrelation
         clustered: clustered standard errors by the entity column
+    :return : linearmodels model instance
     """
     ## Creating model instance
     if weights is None:
@@ -504,6 +528,7 @@ def fixed_effects(panel_data, formula, weights=None, time_effects=False, cov="un
         robust: robust standard errors
         kernel: robust to heteroskedacity AND serial autocorrelation
         clustered: clustered standard errors by the entity column
+    :return : linearmodels model instance
     """
 
     ## Creating model instance
@@ -540,6 +565,7 @@ def random_effects(panel_data, formula, weights=None, cov="unadjusted"):
         robust: robust standard errors
         kernel: robust to heteroskedacity AND serial autocorrelation
         clustered: clustered standard errors by the entity column
+    :return : linearmodels model instance
     """
 
     ## Creating model instance
@@ -606,7 +632,7 @@ def hausman_fe_re(panel_data, inef_formula, weights=None, cov="unadjusted", leve
         print(f"The p-value of the test is {round(p, 6)} and H0 is NOT REJECTED and random effects is preferred.")
 
 
-def iv_2sls(data, formula, weights=None, cov="robust"):
+def iv_2sls(data, formula, weights=None, cov="robust", clusters=None):
     """
     Fits a 2SLS model with the corresponding covariance matrix.
     The endogenous terms can be formulated using the following syntax: lwage ~ 1 + [educ ~ psem + educ_married] + age...
@@ -621,6 +647,9 @@ def iv_2sls(data, formula, weights=None, cov="robust"):
         robust: robust standard errors
         kernel: robust to heteroskedacity AND serial autocorrelation
         clustered: clustered standard errors by the entity column
+    :param clusters : str or list containing names of the DataFrame variables to cluster by
+        Only should be used when cov="clustered"
+    :return : linearmodels model instance
     """
 
     ## Creating model instance
@@ -630,7 +659,7 @@ def iv_2sls(data, formula, weights=None, cov="robust"):
         mod = IV2SLS.from_formula(formula=formula, data=data, weights=weights)
     
     ## Fitting with desired covariance matrix
-    mod = mod.fit(cov_type='clustered', cluster_entity=True) if cov == 'clustered' else mod.fit(cov_type=cov)
+    mod = mod.fit(cov_type='clustered', clusters=data[clusters]) if cov == 'clustered' else mod.fit(cov_type=cov)
 
     ## Summary
     print(mod.summary)
@@ -663,6 +692,7 @@ def probit_logit(formula, data, model=probit, cov='normal'):
         normal: common standard errors
         robust: HC1 standard errors
         cluster or clustered: clustered standard errors (must specify group)
+    :return : statsmodels model instance
     """
 
     # creating and fitting the model
@@ -708,8 +738,10 @@ def poisson_reg(formula, data, cov='normal'):
         normal: common standard errors
         robust: HC1 standard errors
         cluster or clustered: clustered standard errors (must specify group)
+    :return : statsmodels model instance
     """
-    # creating and fitting the model
+    
+    # Creating and fitting the model
     if cov == "robust":
         mod = poisson(formula, data).fit(use_t=True, cov_type='HC1')
     elif cov == "cluster" or cov == "clustered":

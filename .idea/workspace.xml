@@ -4,10 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="- Added Durbin-Watson Test in ols_diagnostics()&#10;- IV2SLS now has robust standard errors by default&#10;- Reminded users (in docstrings) to explicitly include an intercept when working with linearmodels functions (panel and IV models)">
+    <list default="true" id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="- Added notebooks and bibliography">
+      <change afterPath="$PROJECT_DIR$/Gujarati-Econometria-Básica-5a-1.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Notebooks/Cursos IDP/Aula_2021_10_19_Testes_Regressao_MQ2E.ipynb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Notebooks/Cursos IDP/Aula_2021_10_21_Painel.ipynb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Notebooks/Cursos IDP/Aula_2021_10_26_SeriesTemporais.ipynb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Notebooks/Cursos IDP/Aula_2021_10_28_ModelosPrevisoesSeriesTemporais.ipynb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Notebooks/Cursos IDP/Aula_2021_11_04_Randomizacao_VariaveisInstrumentais.ipynb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Solutions-of-Wooldridge-Introductory-Eco.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Wooldridge_5a_edicao.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Le_PNAD_COVID.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/econometric_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/econometric_functions.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,7 +91,7 @@
       <workItem from="1635289421082" duration="1000" />
       <workItem from="1636049237897" duration="426000" />
       <workItem from="1636057852762" duration="504000" />
-      <workItem from="1637618247938" duration="346000" />
+      <workItem from="1637618247938" duration="850000" />
     </task>
     <task id="LOCAL-00001" summary="Better code formatting.">
       <created>1632607000801</created>
@@ -128,7 +135,21 @@
       <option name="project" value="LOCAL" />
       <updated>1634680458268</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="- Added xtdescribe equivalent&#10;- Added return objects in the docstring of functions">
+      <created>1637619078790</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1637619078791</updated>
+    </task>
+    <task id="LOCAL-00008" summary="- Added notebooks and bibliography">
+      <created>1637619100211</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1637619100211</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -153,6 +174,8 @@
     <MESSAGE value="Added OLS Diagnostics and Cooks Distance for high leverage/outlier data points." />
     <MESSAGE value="Organização de Pastas" />
     <MESSAGE value="- Added Durbin-Watson Test in ols_diagnostics()&#10;- IV2SLS now has robust standard errors by default&#10;- Reminded users (in docstrings) to explicitly include an intercept when working with linearmodels functions (panel and IV models)" />
-    <option name="LAST_COMMIT_MESSAGE" value="- Added Durbin-Watson Test in ols_diagnostics()&#10;- IV2SLS now has robust standard errors by default&#10;- Reminded users (in docstrings) to explicitly include an intercept when working with linearmodels functions (panel and IV models)" />
+    <MESSAGE value="- Added xtdescribe equivalent&#10;- Added return objects in the docstring of functions" />
+    <MESSAGE value="- Added notebooks and bibliography" />
+    <option name="LAST_COMMIT_MESSAGE" value="- Added notebooks and bibliography" />
   </component>
 </project>

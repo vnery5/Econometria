@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="Organização de Pastas">
+    <list default="true" id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="- Added Durbin-Watson Test in ols_diagnostics()&#10;- IV2SLS now has robust standard errors by default&#10;- Reminded users (in docstrings) to explicitly include an intercept when working with linearmodels functions (panel and IV models)">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Le_PNAD_COVID.ipynb" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/econometric_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/econometric_functions.py" afterDir="false" />
@@ -78,7 +78,13 @@
       <workItem from="1634328465169" duration="957000" />
       <workItem from="1634662777304" duration="460000" />
       <workItem from="1634663365200" duration="100000" />
-      <workItem from="1634679468693" duration="669000" />
+      <workItem from="1634679468693" duration="910000" />
+      <workItem from="1634752559625" duration="153000" />
+      <workItem from="1635281623656" duration="177000" />
+      <workItem from="1635289421082" duration="1000" />
+      <workItem from="1636049237897" duration="426000" />
+      <workItem from="1636057852762" duration="504000" />
+      <workItem from="1637618247938" duration="346000" />
     </task>
     <task id="LOCAL-00001" summary="Better code formatting.">
       <created>1632607000801</created>
@@ -115,7 +121,14 @@
       <option name="project" value="LOCAL" />
       <updated>1634663386143</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="- Added Durbin-Watson Test in ols_diagnostics()&#10;- IV2SLS now has robust standard errors by default&#10;- Reminded users (in docstrings) to explicitly include an intercept when working with linearmodels functions (panel and IV models)">
+      <created>1634680458268</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1634680458268</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -139,6 +152,7 @@
     <MESSAGE value="Lots of changes:&#10;&#10;- Added weights option in panel and IV2LS models&#10;- Fixed print identation&#10;- Corrected typos" />
     <MESSAGE value="Added OLS Diagnostics and Cooks Distance for high leverage/outlier data points." />
     <MESSAGE value="Organização de Pastas" />
-    <option name="LAST_COMMIT_MESSAGE" value="Organização de Pastas" />
+    <MESSAGE value="- Added Durbin-Watson Test in ols_diagnostics()&#10;- IV2SLS now has robust standard errors by default&#10;- Reminded users (in docstrings) to explicitly include an intercept when working with linearmodels functions (panel and IV models)" />
+    <option name="LAST_COMMIT_MESSAGE" value="- Added Durbin-Watson Test in ols_diagnostics()&#10;- IV2SLS now has robust standard errors by default&#10;- Reminded users (in docstrings) to explicitly include an intercept when working with linearmodels functions (panel and IV models)" />
   </component>
 </project>

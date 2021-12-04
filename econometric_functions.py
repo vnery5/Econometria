@@ -16,10 +16,11 @@ import numpy as np
 
 # Linear Regression and Statistical Tests
 import statsmodels.api as sm
+import statsmodels.stats.api as sms
 from scipy import stats
 from statsmodels.stats.diagnostic import het_breuschpagan, linear_reset
+from statsmodels.stats.stattools import durbin_watson
 from statsmodels.stats.outliers_influence import variance_inflation_factor
-import statsmodels.stats.api as sms
 
 # Patsy formulas
 from statsmodels.formula.api import logit, probit, poisson, ols
@@ -698,7 +699,7 @@ def probit_logit(formula, data, model=probit, cov='normal'):
     :return : statsmodels model instance
     """
 
-    # creating and fitting the model
+    # Creating and fitting the model
     if cov == "robust":
         mod = model(formula, data).fit(use_t=True, cov_type='HC1')
     elif cov == "cluster" or cov == "clustered":
@@ -711,7 +712,7 @@ def probit_logit(formula, data, model=probit, cov='normal'):
     else:
         mod = model(formula, data).fit(use_t=True)
 
-    ## capturing the marginal effects
+    ## Capturing the marginal effects
     mfx = mod.get_margeff(at='overall')
     clear_output()
 

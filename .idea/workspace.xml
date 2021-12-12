@@ -4,17 +4,36 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="- Added empty lines in docstring">
+    <list default="true" id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="- Adição de planilha no Excel de auto_arima (autoria não-própria)">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Notebooks/ModelosBinarios.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Notebooks/ModelosBinarios.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/econometric_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/econometric_functions.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FlaskConsoleOptions" custom-start-script="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))">
+    <envs>
+      <env key="FLASK_APP" value="app" />
+    </envs>
+    <option name="myCustomStartScript" value="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))" />
+    <option name="myEnvs">
+      <map>
+        <entry key="FLASK_APP" value="app" />
+      </map>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -88,6 +107,8 @@
       <workItem from="1636049237897" duration="426000" />
       <workItem from="1636057852762" duration="504000" />
       <workItem from="1637618247938" duration="1206000" />
+      <workItem from="1639158359422" duration="611000" />
+      <workItem from="1639328409263" duration="14269000" />
     </task>
     <task id="LOCAL-00001" summary="Better code formatting.">
       <created>1632607000801</created>
@@ -159,7 +180,28 @@
       <option name="project" value="LOCAL" />
       <updated>1637619501313</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="- Mudança para conter funções do econometric_functions">
+      <created>1639342029928</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1639342029928</updated>
+    </task>
+    <task id="LOCAL-00012" summary="- Adição de notebooks de modelo de crescimento econômico">
+      <created>1639342050674</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1639342050674</updated>
+    </task>
+    <task id="LOCAL-00013" summary="- Adição de planilha no Excel de auto_arima (autoria não-própria)">
+      <created>1639342081530</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1639342081530</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -186,6 +228,10 @@
     <MESSAGE value="- Added xtdescribe equivalent&#10;- Added return objects in the docstring of functions" />
     <MESSAGE value="- Added notebooks and bibliography" />
     <MESSAGE value="- Added empty lines in docstring" />
-    <option name="LAST_COMMIT_MESSAGE" value="- Added empty lines in docstring" />
+    <MESSAGE value="- DataSpell" />
+    <MESSAGE value="- Mudança para conter funções do econometric_functions" />
+    <MESSAGE value="- Adição de notebooks de modelo de crescimento econômico" />
+    <MESSAGE value="- Adição de planilha no Excel de auto_arima (autoria não-própria)" />
+    <option name="LAST_COMMIT_MESSAGE" value="- Adição de planilha no Excel de auto_arima (autoria não-própria)" />
   </component>
 </project>

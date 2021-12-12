@@ -7,7 +7,7 @@ Author: Vinícius de Almeida Nery Ferreira (FACE/ECO - University of Brasília (
 
 E-mail: vnery5@gmail.com
 
-Github: https://github.com/vnery5/Econometria
+GitHub: https://github.com/vnery5/Econometria
 """
 
 ####################################### Imports #################################################################
@@ -18,7 +18,7 @@ import numpy as np
 import statsmodels.api as sm
 import statsmodels.stats.api as sms
 from scipy import stats
-from statsmodels.stats.diagnostic import het_breuschpagan, linear_reset
+from statsmodels.stats.diagnostic import linear_reset
 from statsmodels.stats.stattools import durbin_watson
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 
@@ -32,18 +32,24 @@ from linearmodels.panel import compare as panel_compare
 from linearmodels.iv import IV2SLS
 from linearmodels.iv import compare as iv_compare
 
+# Time Series
+from statsmodels.tsa.stattools import adfuller
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+from statsmodels.tsa.stattools import coint
+from statsmodels.tsa.arima.model import ARIMA
+from pmdarima.arima import auto_arima
+
 # Graphs
-import matplotlib
 import matplotlib.pyplot as plt
 import seaborn as sns
-import plotly.express as px
-import plotly.graph_objects as go
 
 # General
 import os
 import pathlib
 import glob
 from IPython.display import clear_output
+import warnings
+warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 
 ####################################### Functions ###############################################################
@@ -75,7 +81,7 @@ def get_data_stata(name=""):
         try:
             file = max(glob.glob(f"{str(path)}/*.dta"), key=os.path.getctime)
             df = pd.read_stata(file)
-        except Exception:
+        except FileNotFoundError:
             file = max(glob.glob(f"{str(path_vinicius)}/*.dta"), key=os.path.getctime)
             df = pd.read_stata(file)
 
@@ -87,13 +93,13 @@ def get_data_stata(name=""):
             df = pd.read_stata(file)
             print(f"{name}.dta was read successfully!")
             return df
-        except Exception:
+        except FileNotFoundError:
             try:
                 file = f"{str(path_vinicius)}/{str(name)}.dta"
                 df = pd.read_stata(file)
                 print(f"{name}.dta was read successfully!")
                 return df
-            except Exception:  # file not found
+            except FileNotFoundError:  # file not found
                 print("It was not possible to find the requested file :(")
                 print("Check the file name (without the extension) and if it is in the same directory as this program!")
 
@@ -114,27 +120,27 @@ def ols_reg(formula, data, cov='unadjusted'):
     :return : statsmodels model instance
     """
 
-    # creating and fitting the model
+    # Creating and fitting the model
     if cov == "robust":
         mod = ols(formula, data).fit(use_t=True, cov_type='HC1')
     elif cov == "cluster" or cov == "clustered":
         group = str(input("Which column is the group?"))
         try:
             mod = ols(formula, data).fit(use_t=True, cov_type='cluster', cov_kwds={'groups': data[group]})
-        except Exception:
+        except KeyError:
             erro = "It was not possible to find the selected group. Try again!"
             return erro
     else:
         mod = ols(formula, data).fit(use_t=True)
 
-    ## printing the summary and returning the object
+    ## Printing the summary and returning the object
     print(mod.summary())
     return mod
 
 
 def f_test(H0, model, level=0.05):
     """
-    Calculates a F test based on H0 restrictions. Uses the same type of covariance as the model.
+    Calculates an F test based on H0 restrictions. Uses the same type of covariance as the model.
     It is not necessary to assign the function to an object!
 
     :param H0 : must be on standard patsy syntax ('(var1 = var2 =...), ...')
@@ -221,7 +227,7 @@ def heteroscedascity_test(model, formula, data, level=0.05):
 def ols_diagnostics(formula, model, data, y_string):
     """
     Given the OLS model supplied, calculates statistics and draws graphs that check 4 of the 6 multiple linear
-    regressions hypothesis. Tests done: Harvey-Collier, Variance Influence Factor, RESET, Breusch-Pagan, Jarque-Bera.
+    regressions' hypothesis. Tests done: Harvey-Collier, Variance Influence Factor, RESET, Breusch-Pagan, Jarque-Bera.
     References:
         https://www.statsmodels.org/dev/examples/notebooks/generated/regression_diagnostics.html
         https://medium.com/@vince.shields913/regression-diagnostics-fa476b2f64db
@@ -239,8 +245,8 @@ def ols_diagnostics(formula, model, data, y_string):
     except ValueError:
         print("For information on linearity (MLR 1),  see the 'Residuals vs Fitted Values' plot.\n")
 
-    ## Reset: specification of tue functional form of the model the model
-    reset = linear_reset(model, power=3, use_f=True, cov_type='HC1')
+    ## Reset: specification of the functional form of the model
+    reset = linear_reset(model, use_f=True, cov_type='HC1')
     print(f"Linear Reset (MLR 1) P-value: {reset.pvalue}")
     print("H0: model is well specified and linear.")
     print("For more information, see the Residuals vs Fitted Values plot.\n")
@@ -313,7 +319,7 @@ def ols_diagnostics(formula, model, data, y_string):
     ## Heteroskedasticity: the more disperse and horizontal the points,
     # the more likely it is that homoskedasticity is present
     ax10 = sns.regplot(x=model.fittedvalues, y=np.sqrt(np.abs(model.get_influence().resid_studentized_internal)), 
-                       scatter=True, ci=False,  lowess=True, line_kws={'color': 'blue', 'lw': 1, 'alpha': 0.8},
+                       ci=False,  lowess=True, line_kws={'color': 'blue', 'lw': 1, 'alpha': 0.8},
                        scatter_kws={'facecolors': 'none', 'edgecolors': 'black'}, ax=ax[1, 0])
 
     # Titles
@@ -397,7 +403,7 @@ def cooks_distance_outlier_influence(model):
     
     ## Plotting
     sns.regplot(x=model.get_influence().hat_matrix_diag, y=model.get_influence().resid_studentized_internal, 
-                scatter=True, ci=False, lowess=True, line_kws={'color': 'blue', 'lw': 1, 'alpha': 0.8},
+                ci=False, lowess=True, line_kws={'color': 'blue', 'lw': 1, 'alpha': 0.8},
                 scatter_kws={'facecolors': 'none', 'edgecolors': 'black'})
     
     show_cooks_distance_lines(one_line, np.linspace(.01, .14, 100), 'red', 'Cooks Distance (D=1)')
@@ -448,7 +454,7 @@ def panel_structure(data, entity_column, time_column):
         data = data.set_index([entity_column, time_column])
         data[time_column] = time  # creating a column with the time values (makes it easier to access it later)
         return data
-    except Exception:
+    except KeyError:
         print("One of the columns is not in the dataframe. Please try again!")
         return None
 
@@ -456,7 +462,7 @@ def panel_structure(data, entity_column, time_column):
 def pooled_ols(panel_data, formula, weights=None, cov="unadjusted"):
     """
     Fits a standard Pooled OLS model with the corresponding covariance matrix.
-    Remember to include a intercept in the formula ('1 + ...') and to assign it to an object!
+    Remember to include an intercept in the formula ('1 + ...') and to assign it to an object!
 
     :param panel_data : dataframe (which must be in a panel structure)
     :param formula : patsy formula
@@ -519,7 +525,7 @@ def fixed_effects(panel_data, formula, weights=None, time_effects=False, cov="un
     It can be estimated WITH and WITHOUT a constant.
     It is preferred when the unobserved effects are correlated with the error term
     and, therefore, CAN'T estimate constant terms.
-    Remember to include a intercept in the formula ('1 + ...') and to assign it to an object!
+    Remember to include an intercept in the formula ('1 + ...') and to assign it to an object!
 
     :param panel_data : dataframe (which must be in a panel structure)
     :param formula : patsy formula
@@ -558,7 +564,7 @@ def random_effects(panel_data, formula, weights=None, cov="unadjusted"):
     It can be estimated WITH and WITHOUT a constant.
     It is preferred when the unobserved effects aren't correlated with the error term
     and, therefore, CAN estimate constant terms.
-    Remember to include a intercept in the formula ('1 + ...') and to assign it to an object!
+    Remember to include an intercept in the formula ('1 + ...') and to assign it to an object!
 
     :param panel_data : dataframe (which must be in a panel structure)
     :param formula : patsy formula
@@ -587,8 +593,8 @@ def random_effects(panel_data, formula, weights=None, cov="unadjusted"):
 
 def hausman_fe_re(panel_data, inef_formula, weights=None, cov="unadjusted", level=0.05):
     """
-    Executes a Hausman test, which H0: there is not correlation between unobserved effects and the independent variables
-    It is not necessary to assign the function to an object! But remember to include a intercept in the formulas.
+    Executes a Hausman test, which H0: there is no correlation between unobserved effects and the independent variables
+    It is not necessary to assign the function to an object! But remember to include an intercept in the formulas.
 
     :param panel_data : dataframe (which must be in a panel structure)
     :param inef_formula : patsy formula for the inefficient model under H0 (fixed effects)
@@ -640,7 +646,7 @@ def iv_2sls(data, formula, weights=None, cov="robust", clusters=None):
     """
     Fits a 2SLS model with the corresponding covariance matrix.
     The endogenous terms can be formulated using the following syntax: lwage ~ 1 + [educ ~ psem + educ_married] + age...
-    Remember to include a intercept in the formula ('1 + ...') and to assign it to an object!
+    Remember to include an intercept in the formula ('1 + ...') and to assign it to an object!
 
     :param data : dataframe
     :param formula : patsy formula ('lwage ~ 1 + [educ ~ psem + educ_married] + age + agesq...')
@@ -706,7 +712,7 @@ def probit_logit(formula, data, model=probit, cov='normal'):
         group = str(input("What is the group column?"))
         try:
             mod = model(formula, data).fit(use_t=True, cov_type='cluster', cov_kwds={'groups': data[group]})
-        except Exception:
+        except KeyError:
             erro = "It was not possible to find the desired group. Check the spelling and the data and try again!"
             return erro
     else:
@@ -730,6 +736,7 @@ def probit_logit(formula, data, model=probit, cov='normal'):
 
     return mod
 
+
 def poisson_reg(formula, data, cov='normal'):
     """
     Creates a poisson model and returns its summary and average parcial effects (get_margeff).
@@ -752,7 +759,7 @@ def poisson_reg(formula, data, cov='normal'):
         group = str(input("What is the group column?"))
         try:
             mod = poisson(formula, data).fit(use_t=True, cov_type='cluster', cov_kwds={'groups': data[group]})
-        except Exception:
+        except KeyError:
             erro = "It was not possible to find the desired group. Check the spelling and the data and try again!"
             return erro
     else:
@@ -784,3 +791,406 @@ def poisson_reg(formula, data, cov='normal'):
     print("or a K x N Dimensional array, where K = number of variables and N = number of observations.")
 
     return mod
+
+####################################### Time Series #########################
+### Box-Jenkings: Identification #########################
+def stationarity_test(vColumn, nLevel=0.05, sConstandTrend="c", bGraph=True, nBinsGraph=20):
+    """
+    Performs a stationarity test using the Augmented Dickey Fuller framework.
+    By definition, a stationary series should have constant mean and variance/standard error.
+
+    :param vColumn: DataFrame column/numpy vector in which to perform the test;
+    :param nLevel: significance level; defaults to 0.05.
+    :param sConstandTrend: which type of regression to perform in the test;
+        'c' - constant
+        'ct' - constant and trend
+        'ctt' - constant, linear and quadratic trend
+    :param bGraph: draw a graph displaying general and binned mean/standard error? Defaults to True.
+    :param nBinsGraph: if a graph is drawn, in how many bins the data is to be split?
+    """
+
+    ## Executing test
+    adf_results = adfuller(vColumn, regression=sConstandTrend)
+
+    ## Getting p-value
+    p_value = float(np.around(adf_results[1], 5))
+
+    ## Printing result
+    if p_value < nLevel:
+        print(f"ADF p-value: {p_value}. The H0 of non-stationarity and unit root is rejected (series is stationary).")
+        print("Consider some descriptive analysis using graphs and checking for NaNs! Also, create a DateTime index!")
+    else:
+        print(f"ADF p-value: {p_value}. The H0 of non-stationarity and unit root cannot be rejected.")
+        print("Try differentiating the series using .diff() in order to make it stationary and ready for model use.")
+        print("When testing the differenciated series, remember to remove the initial NaN.")
+        print("Consider some descriptive analysis using graphs and checking for NaNs! Also, create a DateTime index!")
+
+    ## Drawing graph (if requested)
+    if bGraph:
+        ## Binning data into nBinsGraph groups of (almost) equal size
+        chunks = np.array_split(vColumn.values, nBinsGraph)
+
+        ## List to store mean and SEs of bins
+        vMeans, vSEs = [], []
+
+        ## Statistic for each group
+        for chunk in chunks:
+            vMeans.append(np.mean(chunk))
+            vSEs.append(np.std(chunk))
+
+        ## Plotting
+        plt.title('Means and Standard Deviations', size=20)
+        plt.plot(np.arange(len(vMeans)), [np.mean(vColumn.values)] * len(vMeans), label='Global Mean', lw=1.5)
+        plt.scatter(x=np.arange(len(vMeans)), y=vMeans, label='Chunk Means', s=100)
+        plt.plot(np.arange(len(vSEs)), [np.std(vColumn.values)] * len(vSEs), label='Global SE',
+                 lw=1.5, color='orange')
+        plt.scatter(x=np.arange(len(vSEs)), y=vSEs, label='Chunk SEs', color='orange', s=100)
+        plt.legend()
+
+
+def plot_autocorrelation(vColumn, nLags=12):
+    """
+    Plots the autocorrelation and partial autocorrelation function for vColumn.
+
+    :param vColumn: DataFrame column/numpy vector;
+    :param nLags: number of lags.
+    """
+
+    ## Plotting autocorrelation
+    print("Plotting autocorrelation (determines 'Q' in ARIMA)...")
+    print("Shaded area: zone of significance.")
+    plot_acf(vColumn.tolist(), lags=nLags)
+
+    ## Plotting partial autocorrelation
+    print("Plotting partial autocorrelation (determines 'P' in ARIMA)...")
+    plot_pacf(vColumn.tolist(), lags=nLags)
+
+
+def cointegration(vColumn1, vColumn2, nLevel=0.05, sTrend='c'):
+    """
+    Performs the Engle-Granger test for cointegration. Both series must be differentiated ONE time.
+
+    :param vColumn1: DataFrame column/numpy vector;
+    :param vColumn2: DataFrame column/numpy vector;
+    :param nLevel: level of significance
+    :param sTrend: string containing which trend to consider:
+        'c' - constant
+        'ct' - constant and trend
+        'ctt' - constant, linear and quadratic trend
+    """
+
+    ## Plotting
+    plt.plot(vColumn1, color="red", label="Series 1")
+    plt.plot(vColumn2, color="blue", label="Series 2")
+    plt.legend()
+
+    ## Performing test
+    print("Reminder: both series must be I(1) (differentiated/integrated of order 1).")
+    coint_test = coint(vColumn1, vColumn2, trend=sTrend)
+
+    ## Getting p-value
+    p_value = float(np.around(coint_test[1], 5))
+
+    ## Printing result
+    if p_value < nLevel:
+        print(f"Coint p-value: {p_value}. The H0 of no cointegration is rejected (series are cointegrated).")
+    else:
+        print(f"Coint p-value: {p_value}. The H0 of no cointegration cannot be rejected (series are not cointegrated).")
+
+
+### Box-Jenkings: Estimation #########################
+def arima_model(vEndog, mExog=None, tPDQ=None):
+    """
+    Fits an ARIMA model. Order can be specified or determined by auto_arima.
+
+    :param vEndog: DataFrame column/numpy vector containing endogenous data (which will be regressed upon itself)
+    :param mExog: vector/matrix containing exogenous data. Defaults to None
+    :param tPDQ: tuple (p, d, q) containing order of the model;
+        p: number of autorregressions (AR)
+        q: number of differentiations (I)
+        q: number of past prevision errors/moving averages (MA)
+        If None (default), performs an auto_arima()
+
+    :return mod: fitted model instance
+    """
+
+    ## Creating model
+    # If order is specified
+    if tPDQ is not None:
+        # Conditional on whether there are exogenous variables
+        if mExog is None:
+            mod_arima = ARIMA(endog=vEndog, order=tPDQ).fit(cov_type='robust')
+        else:
+            mod_arima = ARIMA(endog=vEndog, exog=mExog, order=tPDQ).fit(cov_type='robust')
+    # If order isn't specified, use auto_arima()
+    else:
+        mod_arima = auto_arima(y=vEndog, X=mExog)
+        mod_arima = mod_arima.fit(y=vEndog, cov_type='robust')
+
+    ## Printing summary and diagnostics
+    print(mod_arima.summary())
+
+    print("For heteroskdasticity, check Prob(H), where H0: homoskedasticity, and the standardized residual graph.")
+    print("If there is hetero., the model error can't be a white noise (which is the desired thing).")
+    print("Estimaed Density and Jarque-Bera have information on normality.")
+    print("In the correlogram, all lollipops must be inside of the shaded area.")
+
+    # Plots
+    mod_arima.plot_diagnostics(figsize=(10, 10))
+    plt.show()
+
+    # Residual means
+    tMean0 = stats.ttest_1samp(mod_arima.resid(), 0, nan_policy='omit')
+    print(f"P-value for the test that residual mean is equal to 0: {np.around(tMean0[1], 5)}.")
+    print("If p < 0.05, H0 is rejected and the residual mean is different from 0 (not ideal).")
+
+    ## Returning
+    return mod_arima
+
+
+### Box-Jenkings: Diagnostics and Prediction #########################
+def arima_fit_prediction(modARIMA, dfData, sColumn, nPeriods, sFreq,
+                         sFitColumn="Fit", sFitPercentageErrorColumn="ErroFit"):
+    """
+    Investigates the fit and predicts nPeriods ahead. In order to work, dfData must have a date-like index.
+
+    :param modARIMA: ARIMA model instance (from auto_arima())
+    :param dfData: DataFrame containing the data; must contain a DateTime index
+    :param sColumn: string of the column that contains the endogenous variable in modARIMA
+    :param nPeriods: number of periods ahead to forecast
+    :param sFreq: "months", "days", "years...". See pd.offsets.DateOffset for options.
+    :param sFitColumn: string of the column that will be created containing fitted values
+    :param sFitPercentageErrorColumn: string of the column that will be created containing fitted values % errors
+    :return
+        dfData: modified DataFrame containing fitted values and errors
+        seriesPrediction: series containing the prediction of nPeriods ahead
+    """
+
+    ## Getting fitted values
+    vFit = modARIMA.predict_in_sample((0, dfData[sColumn].shape[0] - 1))
+
+    ## Adding to DataFrame
+    dfData[sFitColumn] = vFit
+
+    ## Calculating percentage error
+    dfData[sFitPercentageErrorColumn] = 100 * np.abs((dfData[sColumn] - dfData[sFitColumn]) / dfData[sColumn])
+
+    ## Describing errors
+    print(f"Pseudo-R2: {np.around(stats.pearsonr(dfData[sColumn], dfData[sFitColumn])[0] ** 2, 4)}.")
+    print("Describing percentage errors...")
+    print(dfData[sFitPercentageErrorColumn].describe())
+
+    ## Predicting nPeriods ahead
+    vPrediction, mConfInt = modARIMA.predict(n_periods=nPeriods, return_conf_int=True)
+
+    ## Creating index of prediction
+    # Dictionaries to pass sFreq as argument using **
+    dateStart = dfData.index[-1]
+    dictPandasOffsetStart = {sFreq: 1}
+    dictPandasOffsetEnd = {sFreq: 1 + nPeriods}
+    # Index
+    indexPrediction = pd.date_range(start=dateStart + pd.offsets.DateOffset(**dictPandasOffsetStart),
+                                    end=dateStart + pd.offsets.DateOffset(**dictPandasOffsetEnd),
+                                    periods=nPeriods)
+
+    # Creating series to plot
+    seriesPrediction = pd.Series(vPrediction, index=indexPrediction)
+    lower_series = pd.Series(mConfInt[:, 0], index=indexPrediction)
+    upper_series = pd.Series(mConfInt[:, 1], index=indexPrediction)
+
+    ## Creating figure object
+    fig, ax = plt.subplots(nrows=2, figsize=(10, 10))
+
+    ## First plot: fit
+    # Lines and legend
+    ax[0].plot(dfData[sColumn], label="Valores Reais")
+    ax[0].plot(dfData[sFitColumn], label="Modelo")
+    ax[0].legend(frameon=False)
+
+    # Titles
+    ax[0].set(xlabel="Data", title="Valores Reais x Previstos")
+
+    ## Second plot: prediction and confidence interval
+    # Actual data
+    ax[1].plot(dfData[sColumn])
+
+    # Predictions and confidenc intervals
+    ax[1].plot(seriesPrediction, color='darkgreen')
+    ax[1].fill_between(lower_series.index, lower_series, upper_series, color='k', alpha=.15)
+
+    # Titles
+    ax[1].set(xlabel="Data", title=f"Previsão para {nPeriods} períodos a frente")
+
+    ## Printing prediction values
+    print("Prediction values:")
+    print(seriesPrediction)
+
+    ## Returning
+    return dfData, seriesPrediction
+
+
+def arima_train_test_prediction(dfData, sColumn, nPeriods, sFreq, mExog=None):
+    """
+    Investigates the fit and sees how the model competed with the last nPeriods of real data.
+    In order to work, dfData must have a date-like index.
+
+    :param dfData: DataFrame containing the data; must contain a DateTime index
+    :param sColumn: string of the column that contains the endogenous variable in modARIMA
+    :param nPeriods: number of periods ahead to forecast
+    :param sFreq: "months", "days", "years...". See pd.offsets.DateOffset for options.
+    :param mExog: vector/matrix containing exogenous data. Defaults to None
+
+    :return dfTestPrediction: DataFrame containing train and test data
+    """
+
+    ## Splitting data into train and test
+    vTrain = dfData[sColumn].values[:-nPeriods]
+    vTest = dfData[sColumn].values[-nPeriods:]
+
+    ## Fitting the model
+    mod_arima = auto_arima(y=vTrain, X=mExog)
+    mod_arima = mod_arima.fit(y=vTrain, cov_type='robust')
+
+    ## Predicting the last nPeriods
+    vPrediction, mConfInt = mod_arima.predict(n_periods=nPeriods, return_conf_int=True)
+
+    ## Creating index of prediction
+    # Dictionaries to pass sFreq as argument using **
+    dateStart = dfData.index[-1 - nPeriods]
+    dictPandasOffsetStart = {sFreq: 1}
+    dictPandasOffsetEnd = {sFreq: nPeriods}
+    # Index
+    indexPrediction = pd.date_range(start=dateStart + pd.offsets.DateOffset(**dictPandasOffsetStart),
+                                    end=dateStart + pd.offsets.DateOffset(**dictPandasOffsetEnd),
+                                    periods=nPeriods, normalize=True).normalize()
+
+    # Indexing train and test data
+    seriesTrain = pd.Series(vTrain, index=dfData.index.values[:-nPeriods])
+    seriesTest = pd.Series(vTest, index=dfData.index.values[-nPeriods:])
+
+    # Creating series to plot
+    seriesPrediction = pd.Series(vPrediction, index=indexPrediction)
+    lower_series = pd.Series(mConfInt[:, 0], index=indexPrediction)
+    upper_series = pd.Series(mConfInt[:, 1], index=indexPrediction)
+
+    ## Plotting
+    plt.figure(figsize=(12, 5), dpi=100)
+    # Train
+    plt.plot(seriesTrain, label="Treino")
+    # Test
+    plt.plot(seriesTest, label="Teste")
+
+    # Prediction and Confidence Intervals
+    plt.plot(seriesPrediction, color='darkgreen', label="Previsão ARIMA")
+    plt.fill_between(lower_series.index, lower_series, upper_series, color='k', alpha=.15)
+
+    # Legend
+    plt.legend()
+
+    ## Calculating accuracy metrics
+    print("Accuracy Metrics:")
+    prediction_accuracy(vPrediction, vTest)
+
+    ## Creating DataFrame, printing and returning
+    dfTestPrediction = pd.DataFrame([seriesPrediction, seriesTest], index=["Previsão", "Real"]).T
+
+    print("\nTest x Prediction:")
+    print(dfTestPrediction)
+
+    return dfTestPrediction
+
+
+def prediction_accuracy(vPrediction, vTest):
+    """
+    Calculates metrics that show the (lack of) quality of the prediction made by an ARIMA model
+    vPrediction and vTest must be the same size!
+
+    :param vPrediction: unidimensional array containing predicted values
+    :param vTest: unidimensional array containing real values
+    """
+
+    ## MAPE: mean absolute percentage error (erro absoluto percentual médio)
+    mape = np.mean(np.abs(vPrediction - vTest)/np.abs(vTest))
+    ## MAE: mean absolute error (erro absoluto medio)
+    mae = np.mean(np.abs(vPrediction - vTest))
+    ## RMSE: root mean squared error (raiz do erro quadrático médio)
+    rmse = np.mean((vPrediction - vTest)**2)**(1/2)
+    ## Erro máximo absoluto
+    erro_maximo = max(vTest - vPrediction)
+
+    print(f"MAPE: {np.around(mape*100, 4)}%")
+    print(f"MAE: {np.around(mae, 4)}")
+    print(f"RMSE: {np.around(rmse, 4)}")
+    print(f"Erro Máximo: {np.around(erro_maximo, 4)}")
+
+
+####################################### Policy Evaluation (TO DO) #########################
+"""
+Functions that will contain tools to evaluate policies. All methods have been implemented in their respective notebooks,
+but have not yet been generalized to functions. Go check the notebooks in Notebooks/Avaliação de Políticas!
+"""
+
+def t_test_variables(dfDataPreTreatment, sColumnTreated, lVariables=None):
+    """
+    Loops through the columns in lVariables and performs t-test of means in order to see if
+    treatment and control group are similar PRE-treatment. Ideally, they are only different in the outcome variable.
+    If all/most of the test are insignificant, randomization was done properlly and
+    OLS can be used to assess the program's results.
+
+    :param dfDataPreTreatment: DataFrame containing all observations pre-treatment;
+    :param sColumnTreated: string that identifies the 1/0 column that determines if an individual is treated or not;
+    :param lVariables: list of variables to test. If None, does all column in dfDataPreTreatment
+
+    """
+    ## Counting ratio of treated and controls in respect to total
+    print(dfDataPreTreatment[sColumnTreated].value_counts(normalize=True))
+
+    ## Creating DataFrames
+    dfTreatment = dfDataPreTreatment.query(f'{sColumnTreated} == 1')
+    dfControl = dfDataPreTreatment.query(f'{sColumnTreated} == 0')
+
+    ## Looping
+    lVariables = lVariables if lVariables is not None else list(dfDataPreTreatment.columns)
+    for sVariable in lVariables:
+        ## Test
+        tuplaTeste = stats.ttest_ind(dfTreatment[sVariable], dfControl[sVariable], nan_policy='omit')
+
+        ## Checking to see if the difference is significant
+        sAsterisco = "**" if tuplaTeste[1] < 0.05 else ""
+
+        ## Getting means
+        nMeanTreated = dfTreatment[sVariable].mean()
+        nMeanControl = dfControl[sVariable].mean()
+
+        ## Printing
+        print(f"\n========================= {sVariable}{sAsterisco} =========================")
+        print(f"Média Tratamento: {np.around(nMeanTreated, 2)}")
+        print(f"Média Comparação: {np.around(nMeanControl, 2)}")
+        print(f"Diferença = {np.around(nMeanTreated - nMeanControl, 2)}")
+        print(f"Estatística = {np.around(tuplaTeste[0], 4)} \t P-valor = {np.around(tuplaTeste[1], 4)}")
+
+
+def normalize(dfData, sColumnNormalization, sColumnToBeNormalized):
+    """
+    Normalizes a column (sColumnToBeNormalized) based on sColumnNormalization mean and std.
+
+    :param dfData: DataFrame;
+    :param sColumnNormalization: string that identifies the column which contains the characteristic used for norm.
+    :param sColumnToBeNormalized: string that identifies the column whose values will be normalized.
+
+    :return dfData: DataFrame with normalized column
+    """
+
+    ## Mean and Standard Deviation
+    nMean = dfData[sColumnNormalization].mean()
+    nSTD = dfData[sColumnNormalization].std()
+
+    ## Z-score
+    vZ = (dfData[sColumnNormalization] - nMean) / nSTD
+
+    ## Normalized
+    dfData[f"{sColumnToBeNormalized}_Norm"] = dfData[sColumnToBeNormalized] + (dfData[sColumnToBeNormalized].std() * vZ)
+
+    ## Printing and returning
+    print(dfData.head())
+    return dfData

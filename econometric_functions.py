@@ -53,57 +53,6 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 
 ####################################### Functions ###############################################################
-####################################### .dta Data Collection ####################################################
-def get_data_stata(name=""):
-    """
-    Reads STATA (.dta) archives; the extension is not necessary.
-    The file must be in the same folder as the .py ou .ipynb archive.
-    Parameters
-    ----------
-    :param name: name/path of data to be read.
-        Defaults to "", which reads the most recent added file to the folder
-
-    Returns
-    -------
-    df: dataframe containing the data
-
-    """
-
-    # getting current files path
-    path = pathlib.Path().absolute()
-
-    # in my specific case:
-    path_vinicius = f"{path}/datasets"
-
-    ## checking to see if the name was the inserted or not;
-    # if not, get the latest .dta file
-    if name == "":
-        try:
-            file = max(glob.glob(f"{str(path)}/*.dta"), key=os.path.getctime)
-            df = pd.read_stata(file)
-        except FileNotFoundError:
-            file = max(glob.glob(f"{str(path_vinicius)}/*.dta"), key=os.path.getctime)
-            df = pd.read_stata(file)
-
-        print(f"{file}.dta was read successfully!")
-        return df
-    else:
-        try:
-            file = f"{str(path)}/{str(name)}.dta"
-            df = pd.read_stata(file)
-            print(f"{name}.dta was read successfully!")
-            return df
-        except FileNotFoundError:
-            try:
-                file = f"{str(path_vinicius)}/{str(name)}.dta"
-                df = pd.read_stata(file)
-                print(f"{name}.dta was read successfully!")
-                return df
-            except FileNotFoundError:  # file not found
-                print("It was not possible to find the requested file :(")
-                print("Check the file name (without the extension) and if it is in the same directory as this program!")
-
-
 ####################################### Continuous Dependent Variables ##########################################
 def ols_reg(formula, data, cov='unadjusted'):
     """
@@ -991,7 +940,7 @@ def arima_fit_prediction(modARIMA, dfData, sColumn, nPeriods, sFreq,
     # Index
     indexPrediction = pd.date_range(start=dateStart + pd.offsets.DateOffset(**dictPandasOffsetStart),
                                     end=dateStart + pd.offsets.DateOffset(**dictPandasOffsetEnd),
-                                    periods=nPeriods)
+                                    periods=nPeriods, normalize=True).normalize()
 
     # Creating series to plot
     seriesPrediction = pd.Series(vPrediction, index=indexPrediction)

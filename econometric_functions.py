@@ -42,11 +42,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # General
-import os
-import pathlib
-import glob
 from IPython.display import clear_output
 import warnings
+
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 
@@ -180,7 +178,7 @@ def ols_diagnostics(formula, model, data, y_string):
         https://medium.com/@vince.shields913/regression-diagnostics-fa476b2f64db
     :param formula : patsy formula of the model;
     :param model : fitted model object;
-    :param data : DataFrame containing the data; 
+    :param data : DataFrame containing the data;
     :param y_string : string (name) of the dependent variable
     """
 
@@ -241,7 +239,7 @@ def ols_diagnostics(formula, model, data, y_string):
     ax00 = sns.residplot(x=model.fittedvalues, y=y_string, data=data, lowess=True,
                          scatter_kws={'facecolors': 'none', 'edgecolors': 'black'},
                          line_kws={'color': 'blue', 'lw': 1, 'alpha': 0.8}, ax=ax[0, 0])
-    
+
     # Titles
     ax00.set_title('Linearity: Residuals vs Fitted', fontsize=12)
     ax00.set_xlabel('Fitted Values', fontsize=10)
@@ -254,8 +252,8 @@ def ols_diagnostics(formula, model, data, y_string):
     ax01.set_xticklabels(labels=dfVIF["Variables"], rotation=0, color='k')
 
     # Annotations
-    for p in ax01.patches:                 
-        ax01.annotate(round(p.get_height(), 2), (p.get_x()+p.get_width()/2., p.get_height()), 
+    for p in ax01.patches:
+        ax01.annotate(round(p.get_height(), 2), (p.get_x() + p.get_width() / 2., p.get_height()),
                       ha='center', va='center', xytext=(0, 10), textcoords='offset points')
 
     ## Titles
@@ -265,8 +263,8 @@ def ols_diagnostics(formula, model, data, y_string):
 
     ## Heteroskedasticity: the more disperse and horizontal the points,
     # the more likely it is that homoskedasticity is present
-    ax10 = sns.regplot(x=model.fittedvalues, y=np.sqrt(np.abs(model.get_influence().resid_studentized_internal)), 
-                       ci=False,  lowess=True, line_kws={'color': 'blue', 'lw': 1, 'alpha': 0.8},
+    ax10 = sns.regplot(x=model.fittedvalues, y=np.sqrt(np.abs(model.get_influence().resid_studentized_internal)),
+                       ci=False, lowess=True, line_kws={'color': 'blue', 'lw': 1, 'alpha': 0.8},
                        scatter_kws={'facecolors': 'none', 'edgecolors': 'black'}, ax=ax[1, 0])
 
     # Titles
@@ -344,15 +342,15 @@ def cooks_distance_outlier_influence(model):
 
     def point_five_line(x):
         return np.sqrt((0.5 * len(model.params) * (1 - x)) / x)
-    
+
     def show_cooks_distance_lines(tx, inc, color, label):
         plt.plot(inc, tx(inc), label=label, color=color, ls='--')
-    
+
     ## Plotting
-    sns.regplot(x=model.get_influence().hat_matrix_diag, y=model.get_influence().resid_studentized_internal, 
+    sns.regplot(x=model.get_influence().hat_matrix_diag, y=model.get_influence().resid_studentized_internal,
                 ci=False, lowess=True, line_kws={'color': 'blue', 'lw': 1, 'alpha': 0.8},
                 scatter_kws={'facecolors': 'none', 'edgecolors': 'black'})
-    
+
     show_cooks_distance_lines(one_line, np.linspace(.01, .14, 100), 'red', 'Cooks Distance (D=1)')
 
     show_cooks_distance_lines(point_five_line, np.linspace(.01, .14, 100), 'black', 'Cooks Distance (D=0.5)')
@@ -377,7 +375,7 @@ def xtdescribe_panel(data, entity_column):
 
     ## Number of appearances of each individual and adding as a column to the dataset
     data["number_appearances"] = data.groupby(entity_column)[entity_column].transform('count')
-    
+
     ## Printing xtdescribe
     print(data.drop_duplicates(subset=[entity_column], keep='first')["number_appearances"].value_counts(normalize=True))
 
@@ -428,7 +426,7 @@ def pooled_ols(panel_data, formula, weights=None, cov="unadjusted"):
         mod = PooledOLS.from_formula(formula=formula, data=panel_data)
     else:
         mod = PooledOLS.from_formula(formula=formula, data=panel_data, weights=weights)
-    
+
     ## Fitting with desired covariance matrix
     mod = mod.fit(cov_type='clustered', cluster_entity=True) if cov == 'clustered' else mod.fit(cov_type=cov)
 
@@ -441,7 +439,7 @@ def first_difference(panel_data, formula, weights=None, cov="unadjusted"):
     """
     Fits a standard FD model with the corresponding covariance matrix and WITHOUT an intercept.
     Remember to assign it to an object!
-    
+
     :param panel_data : dataframe (which must be in a panel structure)
     :param formula : patsy formula
     :param weights : N x 1 Series or vector containing weights to be used in estimation; defaults to None
@@ -458,7 +456,7 @@ def first_difference(panel_data, formula, weights=None, cov="unadjusted"):
         mod = FirstDifferenceOLS.from_formula(formula=formula, data=panel_data)
     else:
         mod = FirstDifferenceOLS.from_formula(formula=formula, data=panel_data, weights=weights)
-    
+
     ## Fitting with desired covariance matrix
     mod = mod.fit(cov_type='clustered', cluster_entity=True) if cov == 'clustered' else mod.fit(cov_type=cov)
 
@@ -614,7 +612,7 @@ def iv_2sls(data, formula, weights=None, cov="robust", clusters=None):
         mod = IV2SLS.from_formula(formula=formula, data=data)
     else:
         mod = IV2SLS.from_formula(formula=formula, data=data, weights=weights)
-    
+
     ## Fitting with desired covariance matrix
     mod = mod.fit(cov_type='clustered', clusters=data[clusters]) if cov == 'clustered' else mod.fit(cov_type=cov)
 
@@ -641,7 +639,7 @@ def probit_logit(formula, data, model=probit, cov='normal'):
     Creates a probit/logit model and returns its summary and average parcial effects (get_margeff).
     Documentation: https://www.statsmodels.org/stable/examples/notebooks/generated/discrete_choice_example.html
     Remember to use mod = probit_logit(...)!
-    
+
     :param formula: patsy formula
     :param data: dataframe
     :param model: probit or logit. Defaults to probit.
@@ -698,7 +696,7 @@ def poisson_reg(formula, data, cov='normal'):
         cluster or clustered: clustered standard errors (must specify group)
     :return : statsmodels model instance
     """
-    
+
     # Creating and fitting the model
     if cov == "robust":
         mod = poisson(formula, data).fit(use_t=True, cov_type='HC1')
@@ -726,7 +724,7 @@ def poisson_reg(formula, data, cov='normal'):
         f"If not, they must be multiplied by {sigma}.")
 
     print("##############################################################################")
-    
+
     print(mfx.summary())
     print(
         "\nMarginal effects on certain values can be found using 'mod.get_margeff(atexog = values).summary()', " +
@@ -738,6 +736,7 @@ def poisson_reg(formula, data, cov='normal'):
     print("or a K x N Dimensional array, where K = number of variables and N = number of observations.")
 
     return mod
+
 
 ####################################### Time Series #########################
 ### Box-Jenkings: Identification #########################
@@ -1057,15 +1056,15 @@ def prediction_accuracy(vPrediction, vTest):
     """
 
     ## MAPE: mean absolute percentage error (erro absoluto percentual médio)
-    mape = np.mean(np.abs(vPrediction - vTest)/np.abs(vTest))
+    mape = np.mean(np.abs(vPrediction - vTest) / np.abs(vTest))
     ## MAE: mean absolute error (erro absoluto medio)
     mae = np.mean(np.abs(vPrediction - vTest))
     ## RMSE: root mean squared error (raiz do erro quadrático médio)
-    rmse = np.mean((vPrediction - vTest)**2)**(1/2)
+    rmse = np.mean((vPrediction - vTest) ** 2) ** (1 / 2)
     ## Erro máximo absoluto
     erro_maximo = max(vTest - vPrediction)
 
-    print(f"MAPE: {np.around(mape*100, 4)}%")
+    print(f"MAPE: {np.around(mape * 100, 4)}%")
     print(f"MAE: {np.around(mae, 4)}")
     print(f"RMSE: {np.around(rmse, 4)}")
     print(f"Erro Máximo: {np.around(erro_maximo, 4)}")
@@ -1076,6 +1075,7 @@ def prediction_accuracy(vPrediction, vTest):
 Functions that will contain tools to evaluate policies. All methods have been implemented in their respective notebooks,
 but have not yet been generalized to functions. Go check the notebooks in Notebooks/Avaliação de Políticas!
 """
+
 
 def t_test_variables(dfDataPreTreatment, sColumnTreated, lVariables=None):
     """

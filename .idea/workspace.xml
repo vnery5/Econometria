@@ -6,7 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="- Removed .dta collection&#10;- Added normalization in arima_fit_predict()">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/econometric_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/econometric_functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Lendo PNADC no R.R" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -111,6 +112,7 @@
       <workItem from="1639328409263" duration="14778000" />
       <workItem from="1639344140337" duration="148000" />
       <workItem from="1639875845686" duration="1931000" />
+      <workItem from="1639878835870" duration="536000" />
     </task>
     <task id="LOCAL-00001" summary="Better code formatting.">
       <created>1632607000801</created>

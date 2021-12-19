@@ -15,6 +15,8 @@ As funções estão reunidas no arquivo **`econometric_functions.py`**. As princ
 
 Nesse sentido, `cooks_distance_outlier_influence` ajuda a averiguar a existência de outliers e observações com alta alavancagem, que poderiam ter muita influênciia sobre os coeficientes estimados para a regressão.
 
+![screenshot](Prints/diagnostics)
+
 ----
 
 ## Modelos de Painel
@@ -38,8 +40,17 @@ Implementação de `probit`, `logit` e `poisson`, printando os efeitos marginais
 
 Seguindo a metodologia de Box-Jenkins, apresenta funções de *identificação* (**autocorrelação, teste de estacionariedade e cointegração**), *estimação* (**ARIMA**, automatizado via `pmdarima` ou com ordem especificada) e *diagnóstico* (previsão períodos a frente, previsão frente a dados de teste e métricas de acurácia).
 
+![screenshot](Prints/previsao_arima)
+![screenshot](Prints/arima_teste_treino)
+
 ----
 
 ## Avaliação de Políticas Públicas
 
 As funções ainda precisam ser implementadas, mas há uma série de exemplos na pasta *Notebooks/Avaliação de Políticas*. Os notebooks cobrem os tópicos de **Randomização** e **Variáveis Instrumentais**, **Diferenças em Diferenças**, **RDD**, **Controle Sintético** e **Propensity Score Matching**.
+
+Parte do conteúdo, feito para uma disciplina da faculdade IDP, foi adaptado do livro do World Bank (ver bibliografia) e parte do site [Causal Inference for the Brave and The True](https://matheusfacure.github.io/python-causality-handbook/landing-page.html).
+
+![screenshot](Prints/controle_sintetico_placebos)
+![screenshot](Prints/pareamento_psm)
+![screenshot](Prints/rdd)

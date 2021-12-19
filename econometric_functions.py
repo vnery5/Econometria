@@ -1,7 +1,5 @@
 """
-Functions that will do most of the basic econometric regression and panel models and tests.
-
-Based mainly on the seminal book of Introduction to Econometrics by Jeffrey Wooldridge (6th edition).
+Functions that will do most of the basic econometric regressions, tests, panel models, IVs and Time Series applications.
 
 Author: Vinícius de Almeida Nery Ferreira (FACE/ECO - University of Brasília (UnB)).
 

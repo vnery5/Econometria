@@ -15,7 +15,9 @@ As funções estão reunidas no arquivo **`econometric_functions.py`**. As princ
 
 Nesse sentido, `cooks_distance_outlier_influence` ajuda a averiguar a existência de outliers e observações com alta alavancagem, que poderiam ter muita influênciia sobre os coeficientes estimados para a regressão.
 
-![screenshot](Prints/diagnostics.png)
+<p align="center">
+<img src="Prints/diagnostics.png" alt="Diagnósticos MQO" width="500"/>
+</p>
 
 ----
 
@@ -40,8 +42,9 @@ Implementação de `probit`, `logit` e `poisson`, printando os efeitos marginais
 
 Seguindo a metodologia de Box-Jenkins, apresenta funções de *identificação* (**autocorrelação, teste de estacionariedade e cointegração**), *estimação* (**ARIMA**, automatizado via `pmdarima` ou com ordem especificada) e *diagnóstico* (previsão períodos a frente, previsão frente a dados de teste e métricas de acurácia).
 
-![screenshot](Prints/previsao_arima.png)
-![screenshot](Prints/arima_teste_treino.png)
+<p align="center">
+<img src="Prints/previsao_arima.png" alt="Previsão ARIMA" width="500"/>
+</p>
 
 ----
 
@@ -51,6 +54,14 @@ As funções ainda precisam ser implementadas, mas há uma série de exemplos na
 
 Parte do conteúdo, feito para uma disciplina da faculdade IDP, foi adaptado do livro do World Bank (ver bibliografia) e parte do site [Causal Inference for the Brave and The True](https://matheusfacure.github.io/python-causality-handbook/landing-page.html).
 
-![screenshot](Prints/controle_sintetico_placebos.png)
-![screenshot](Prints/pareamento_psm.png)
-![screenshot](Prints/rdd.png)
+<p align="center">
+<img src="Prints/controle_sintetico_placebos.png" alt="Controle Sintético" width="500"/>
+</p>
+
+<p align="center">
+<img src="Prints/pareamento_psm.png" alt="Pareamento PSM" width="500"/>
+</p>
+
+<p align="center">
+<img src="Prints/rdd.png" alt="Regressão Discontínua" width="500"/>
+</p>

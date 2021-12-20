@@ -630,7 +630,7 @@ def iv_2sls(data, formula, weights=None, cov="robust", clusters=None):
 ## MISSING: Heckit, Tobit and discontinuous/censored regressions
 ## Heckman procedures for sample correction can be imported from the Heckman.py file (unreleased version of statsmodels)
 
-def probit_logit(formula, data, model=probit, cov='normal'):
+def probit_logit(formula, data, model=probit, cov='normal', marg_effects='overall'):
     """
     Creates a probit/logit model and returns its summary and average parcial effects (get_margeff).
     Documentation: https://www.statsmodels.org/stable/examples/notebooks/generated/discrete_choice_example.html
@@ -643,6 +643,7 @@ def probit_logit(formula, data, model=probit, cov='normal'):
         normal: common standard errors
         robust: HC1 standard errors
         cluster or clustered: clustered standard errors (must specify group)
+    :param marg_effects : str, either 'overall' (APE), 'mean' (PEA) or 'zero'. Defaults to 'overall' (APE).
     :return : statsmodels model instance
     """
 
@@ -660,7 +661,7 @@ def probit_logit(formula, data, model=probit, cov='normal'):
         mod = model(formula, data).fit(use_t=True)
 
     ## Capturing the marginal effects
-    mfx = mod.get_margeff(at='overall')
+    mfx = mod.get_margeff(at=marg_effects)
     clear_output()
 
     print(mod.summary())

@@ -52,8 +52,8 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 ####################################### Continuous Dependent Variables ##########################################
 def ols_reg(formula, data, cov='unadjusted'):
     """
-    Fits a standard OLS model with the corresponding covariance matrix.
-    To compute without an intercept, use -1 in the formula.
+    Fits a standard OLS model with the corresponding covariance matrix using a R-style formula (y ~ x1 + x2...).
+    To compute without an intercept, use -1 or 0 in the formula.
     Remember to use mod = ols_reg(...).
     For generalized and weighted estimation, see statsmodels documentation or the first version of this file.
     :param formula: patsy formula (R style)
@@ -88,12 +88,13 @@ def f_test(H0, model, level=0.05):
     Calculates an F test based on H0 restrictions. Uses the same type of covariance as the model.
     It is not necessary to assign the function to an object!
 
-    :param H0 : must be on standard patsy syntax ('(var1 = var2 =...), ...')
+    :param H0 : must be on standard patsy/R syntax ('(var1 = var2 =...), ...').
+        For significance tests, the syntax is 'var1 = var2 = ... = 0'
     :param model: fit instance (usually 'mod')
     :param level: significance level. Defaults to 5%
     """
-    ## usually, we use the wald_test method from the fit instance
-    # for panel models (from linearmodels), we must specify the parameter 'formula'
+    ## Usually, we use the wald_test method from the fit instance
+    # For panel models (from linearmodels), we must specify the parameter 'formula'
     try:
         test = 'LM'
         est = model.wald_test(formula=H0).stat
@@ -279,8 +280,7 @@ def ols_diagnostics(formula, model, data, y_string):
 
 def j_davidson_mackinnon_ols(formula1, formula2, data, cov='normal', level=0.05):
     """
-    Executes a J test to verify which model is more adequate.
-    H0 says that model 1 is preferable
+    Executes a J test to verify which model is more adequate. H0 says that model 1 is preferable.
     It is not necessary to assign the function to an object!
 
     :param formula1 : formula for the first model (use -1 for an origin regression)
@@ -333,9 +333,6 @@ def cooks_distance_outlier_influence(model):
     :param model: fitted OLS model object.
     """
 
-    ## Defining theme
-    plt.style.use('seaborn-white')
-
     ## Creating functions that define D = 0.5 and D = 1.0
     def one_line(x):
         return np.sqrt((1 * len(model.params) * (1 - x)) / x)
@@ -364,13 +361,13 @@ def cooks_distance_outlier_influence(model):
 ####################################### Panel Models (linearmodels) #############################################
 def xtdescribe_panel(data, entity_column):
     """
-    Calculates the total appearances for each individual and checks how balanced the dataset is.
+    Calculates the total appearances for each individual and checks how balanced the panel dataset is.
 
     :param data : dataframe
     :param entity_column : str, column that represents the individuals (what would be the 1st level index)
-        Important: must be called BEFORE panel_structure
+        Important: the fuction must be called BEFORE panel_structure
 
-    :return : modified dataset with appearance column and prints how balanced the panel is
+    :return : modified dataset with number of appearances column and prints how balanced the panel is
     """
 
     ## Number of appearances of each individual and adding as a column to the dataset
@@ -393,7 +390,7 @@ def panel_structure(data, entity_column, time_column):
     :return : modified DataFrame with the panel structure
     """
 
-    ## Creating MultiIndex and maintains columns in the DataFrame
+    ## Creating MultiIndex and mantaining columns in the DataFrame
     try:
         time = pd.Categorical(data[time_column])
         data = data.set_index([entity_column, time_column])
@@ -407,7 +404,7 @@ def panel_structure(data, entity_column, time_column):
 def pooled_ols(panel_data, formula, weights=None, cov="unadjusted"):
     """
     Fits a standard Pooled OLS model with the corresponding covariance matrix.
-    Remember to include an intercept in the formula ('1 + ...') and to assign it to an object!
+    Remember to include an intercept in the formula ('y ~ 1 + x1 + ...') and to assign it to an object!
 
     :param panel_data : dataframe (which must be in a panel structure)
     :param formula : patsy formula
@@ -470,7 +467,7 @@ def fixed_effects(panel_data, formula, weights=None, time_effects=False, cov="un
     It can be estimated WITH and WITHOUT a constant.
     It is preferred when the unobserved effects are correlated with the error term
     and, therefore, CAN'T estimate constant terms.
-    Remember to include an intercept in the formula ('1 + ...') and to assign it to an object!
+    Remember to include an intercept in the formula ('y ~ 1 + x1 + ...') and to assign it to an object!
 
     :param panel_data : dataframe (which must be in a panel structure)
     :param formula : patsy formula
@@ -509,7 +506,7 @@ def random_effects(panel_data, formula, weights=None, cov="unadjusted"):
     It can be estimated WITH and WITHOUT a constant.
     It is preferred when the unobserved effects aren't correlated with the error term
     and, therefore, CAN estimate constant terms.
-    Remember to include an intercept in the formula ('1 + ...') and to assign it to an object!
+    Remember to include an intercept in the formula ('y ~ 1 + x1 + ...') and to assign it to an object!
 
     :param panel_data : dataframe (which must be in a panel structure)
     :param formula : patsy formula
@@ -591,7 +588,7 @@ def iv_2sls(data, formula, weights=None, cov="robust", clusters=None):
     """
     Fits a 2SLS model with the corresponding covariance matrix.
     The endogenous terms can be formulated using the following syntax: lwage ~ 1 + [educ ~ psem + educ_married] + age...
-    Remember to include an intercept in the formula ('1 + ...') and to assign it to an object!
+    Remember to include an intercept in the formula ('y ~ 1 + x1 + ...') and to assign it to an object!
 
     :param data : dataframe
     :param formula : patsy formula ('lwage ~ 1 + [educ ~ psem + educ_married] + age + agesq...')
@@ -631,8 +628,7 @@ def iv_2sls(data, formula, weights=None, cov="robust", clusters=None):
 
 ####################################### Discrete Dependent Variables and Selection Bias #########################
 ## MISSING: Heckit, Tobit and discontinuous/censored regressions
-## Heckman procedures for sample correction can be imported from the Heckman.py file
-# Alternatively, these models can be used in R, as exemplified in the file 'Tobit_Heckman.R'
+## Heckman procedures for sample correction can be imported from the Heckman.py file (unreleased version of statsmodels)
 
 def probit_logit(formula, data, model=probit, cov='normal'):
     """
@@ -848,6 +844,7 @@ def cointegration(vColumn1, vColumn2, nLevel=0.05, sTrend='c'):
 def arima_model(vEndog, mExog=None, tPDQ=None):
     """
     Fits an ARIMA model. Order can be specified or determined by auto_arima.
+    Differently from other models, it does not work on patsy/R formula syntax.
 
     :param vEndog: DataFrame column/numpy vector containing endogenous data (which will be regressed upon itself)
     :param mExog: vector/matrix containing exogenous data. Defaults to None

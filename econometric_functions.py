@@ -52,7 +52,7 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 ####################################### Continuous Dependent Variables ##########################################
 def ols_reg(formula, data, cov='unadjusted'):
     """
-    Fits a standard OLS model with the corresponding covariance matrix using a R-style formula (y ~ x1 + x2...).
+    Fits a standard OLS model with the corresponding covariance matrix using an R-style formula (y ~ x1 + x2...).
     To compute without an intercept, use -1 or 0 in the formula.
     Remember to use mod = ols_reg(...).
     For generalized and weighted estimation, see statsmodels documentation or the first version of this file.
@@ -73,7 +73,7 @@ def ols_reg(formula, data, cov='unadjusted'):
         try:
             mod = ols(formula, data).fit(use_t=True, cov_type='cluster', cov_kwds={'groups': data[group]})
         except KeyError:
-            erro = "It was not possible to find the selected group. Try again!"
+            erro = "It was not possible to find the selected group. Check the spelling and try again!"
             return erro
     else:
         mod = ols(formula, data).fit(use_t=True)
@@ -123,7 +123,7 @@ def heteroscedascity_test(model, formula, data, level=0.05):
         PanelOLS (FixedEffects)
         RandomEffects
         FirstDifferenceOLS
-    :param formula : model formula
+    :param formula : patsy/R formula of the model to be tested
     :param data : dataframe
     :param level : significance level (defaults to 5%)
     """
@@ -564,16 +564,16 @@ def hausman_fe_re(panel_data, inef_formula, weights=None, cov="unadjusted", leve
                                       drop_absorbed=True, weights=weights).fit(cov_type=cov)
 
     ## Computing the Hausman statistic
-    # difference between the asymptotic variance
+    # Difference between asymptotic variances
     var_assin = fixed.cov - random.cov
-    # difference between parameters
+    # Difference between parameters
     d = fixed.params - random.params
-    # calculating H
+    # Calculating H (statistic)
     H = d.dot(np.linalg.inv(var_assin)).dot(d)
-    # calculating degrees of freedom
+    # Degrees of freedom
     freedom = random.params.size - 1
 
-    # calculating p-value using chi2 survival function (1 - cumulative distribution function)
+    # Calculating p-value using chi2 survival function (sf, 1 - cumulative distribution function)
     p = stats.chi2(freedom).sf(H)
 
     if p < level:
@@ -681,9 +681,9 @@ def probit_logit(formula, data, model=probit, cov='normal', marg_effects='overal
 
 def poisson_reg(formula, data, cov='normal'):
     """
-    Creates a poisson model and returns its summary and average parcial effects (get_margeff).
+    Creates a poisson model (counting y variable) and returns its summary and average parcial effects (get_margeff).
     Documentation: https://www.statsmodels.org/stable/examples/notebooks/generated/discrete_choice_example.html
-    Remember to use mod = poisson_reeg(...)!
+    Remember to use mod = poisson_reg(...)!
 
     :param formula: patsy formula
     :param data: dataframe
@@ -707,10 +707,10 @@ def poisson_reg(formula, data, cov='normal'):
     else:
         mod = poisson(formula, data).fit(use_t=True)
 
-    ## calculating under/overdispersion
+    ## Calculating under/overdispersion
     sigma = np.around((sum(mod.resid ** 2 / mod.predict()) / mod.df_resid) ** (1 / 2), 2)
 
-    ## capturing the marginal effects
+    ## Capturing marginal effects
     mfx = mod.get_margeff(at='overall')
     clear_output()
 
@@ -785,8 +785,7 @@ def stationarity_test(vColumn, nLevel=0.05, sConstandTrend="c", bGraph=True, nBi
         plt.title('Means and Standard Deviations', size=20)
         plt.plot(np.arange(len(vMeans)), [np.mean(vColumn.values)] * len(vMeans), label='Global Mean', lw=1.5)
         plt.scatter(x=np.arange(len(vMeans)), y=vMeans, label='Chunk Means', s=100)
-        plt.plot(np.arange(len(vSEs)), [np.std(vColumn.values)] * len(vSEs), label='Global SE',
-                 lw=1.5, color='orange')
+        plt.plot(np.arange(len(vSEs)), [np.std(vColumn.values)] * len(vSEs), label='Global SE', lw=1.5, color='orange')
         plt.scatter(x=np.arange(len(vSEs)), y=vSEs, label='Chunk SEs', color='orange', s=100)
         plt.legend()
 

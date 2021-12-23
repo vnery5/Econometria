@@ -470,7 +470,7 @@ def fixed_effects(panel_data, formula, weights=None, time_effects=False, cov="un
     Remember to include an intercept in the formula ('y ~ 1 + x1 + ...') and to assign it to an object!
 
     :param panel_data : dataframe (which must be in a panel structure)
-    :param formula : patsy formula
+    :param formula : patsy/R formula (without EntityEffects, will be added inside the function)
     :param weights : N x 1 Series or vector containing weights to be used in estimation; defaults to None
         Use is recommended when analyzing survey data, passing on the weight available in the survey
     :param time_effects : bool, defaults to False

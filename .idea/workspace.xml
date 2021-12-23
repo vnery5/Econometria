@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="- Funções de Econometria!">
+    <list default="true" id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="Melhores comentários (Poisson, Hausman)">
+      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -121,6 +122,11 @@
       <workItem from="1639883733836" duration="1518000" />
       <workItem from="1639885498677" duration="52000" />
       <workItem from="1639885879823" duration="40000" />
+      <workItem from="1640040131565" duration="971000" />
+      <workItem from="1640041261387" duration="501000" />
+      <workItem from="1640201067748" duration="679000" />
+      <workItem from="1640210732657" duration="308000" />
+      <workItem from="1640214192755" duration="2340000" />
     </task>
     <task id="LOCAL-00001" summary="Better code formatting.">
       <created>1632607000801</created>
@@ -241,7 +247,28 @@
       <option name="project" value="LOCAL" />
       <updated>1639884548098</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="- Melhor documentação de formulas">
+      <created>1640040618978</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1640040618978</updated>
+    </task>
+    <task id="LOCAL-00019" summary="- Opções para efeitos marginais no probit/logit">
+      <created>1640040872926</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1640040872926</updated>
+    </task>
+    <task id="LOCAL-00020" summary="Melhores comentários (Poisson, Hausman)">
+      <created>1640041756182</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1640041756182</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -276,6 +303,9 @@
     <MESSAGE value="- Removed .dta collection&#10;- Added normalization in arima_fit_predict()" />
     <MESSAGE value="- Transformação do .py em um módulo importável" />
     <MESSAGE value="- Funções de Econometria!" />
-    <option name="LAST_COMMIT_MESSAGE" value="- Funções de Econometria!" />
+    <MESSAGE value="- Melhor documentação de formulas" />
+    <MESSAGE value="- Opções para efeitos marginais no probit/logit" />
+    <MESSAGE value="Melhores comentários (Poisson, Hausman)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Melhores comentários (Poisson, Hausman)" />
   </component>
 </project>

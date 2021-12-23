@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="Melhores comentários (Poisson, Hausman)">
-      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="Melhor documentação da fórmula de efeitos fixos.">
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -127,6 +126,7 @@
       <workItem from="1640201067748" duration="679000" />
       <workItem from="1640210732657" duration="308000" />
       <workItem from="1640214192755" duration="2340000" />
+      <workItem from="1640269372771" duration="299000" />
     </task>
     <task id="LOCAL-00001" summary="Better code formatting.">
       <created>1632607000801</created>
@@ -268,7 +268,14 @@
       <option name="project" value="LOCAL" />
       <updated>1640041756182</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="Melhor documentação da fórmula de efeitos fixos.">
+      <created>1640269557917</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1640269557917</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -306,6 +313,7 @@
     <MESSAGE value="- Melhor documentação de formulas" />
     <MESSAGE value="- Opções para efeitos marginais no probit/logit" />
     <MESSAGE value="Melhores comentários (Poisson, Hausman)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Melhores comentários (Poisson, Hausman)" />
+    <MESSAGE value="Melhor documentação da fórmula de efeitos fixos." />
+    <option name="LAST_COMMIT_MESSAGE" value="Melhor documentação da fórmula de efeitos fixos." />
   </component>
 </project>

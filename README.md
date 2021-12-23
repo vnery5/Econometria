@@ -13,7 +13,7 @@ As funções estão reunidas no arquivo **`econometric_functions.py`**. As princ
 - `f_test`: Realiza um teste F de significância conjunta de várias variáveis. Consequentemente, é capaz de realizar um teste t de significância simples ou igualdade de coeficientes.
 - `ols_diagnostics`: Talvez uma das maiores contribuições do diretório; é similar ao `plot(modelo)` do R, plottando gráficos e realizando testes que verificam todas as hipóteses do modelo linear clássico (Gauss-Markov).
 
-Nesse sentido, `cooks_distance_outlier_influence` ajuda a averiguar a existência de outliers e observações com alta alavancagem, que poderiam ter muita influênciia sobre os coeficientes estimados para a regressão.
+Nesse sentido, `cooks_distance_outlier_influence` ajuda a averiguar a existência de outliers e observações com alta alavancagem, que poderiam ter muita influência sobre os coeficientes estimados para a regressão.
 
 <p align="center">
 <img src="Prints/diagnostics.png" alt="Diagnósticos MQO" width="500"/>
@@ -32,7 +32,7 @@ Além disso, há a implementação de **MQ2E** para Variáveis Instrumentais. To
 
 ----
 
-## Modelos Binários e de Contagemm
+## Modelos Binários e de Contagem
 
 Implementação de `probit`, `logit` e `poisson`, printando os efeitos marginais e alguns outros comandos interessantes para análises.
 
@@ -65,3 +65,11 @@ Parte do conteúdo, feito para uma disciplina da faculdade IDP, foi adaptado do 
 <p align="center">
 <img src="Prints/rdd.png" alt="Regressão Discontínua" width="500"/>
 </p>
+
+----
+
+## Outros
+
+A intenção do repositório é abrigar outros pequenos projetos pessoais, como:
+
+- [Análise dos discursos das CPIs](https://github.com/vnery5/Econometria/tree/main/Notebooks/Linguagem%20Natural) para analisar os temas mais frequentes tratados na comissão parlamentar.

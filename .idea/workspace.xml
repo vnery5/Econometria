@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="Melhor documentação da fórmula de efeitos fixos.">
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+    <list default="true" id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="Adição da análise de linguagem natural dos discursos da CPI (Wordcloud)">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Notebooks/Linguagem Natural/WordCloud CPI.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Notebooks/Linguagem Natural/WordCloud CPI.ipynb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -126,7 +127,8 @@
       <workItem from="1640201067748" duration="679000" />
       <workItem from="1640210732657" duration="308000" />
       <workItem from="1640214192755" duration="2340000" />
-      <workItem from="1640269372771" duration="299000" />
+      <workItem from="1640269372771" duration="436000" />
+      <workItem from="1640271754329" duration="860000" />
     </task>
     <task id="LOCAL-00001" summary="Better code formatting.">
       <created>1632607000801</created>
@@ -275,7 +277,14 @@
       <option name="project" value="LOCAL" />
       <updated>1640269557917</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="Adição da análise de linguagem natural dos discursos da CPI (Wordcloud)">
+      <created>1640269788938</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1640269788938</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -314,6 +323,7 @@
     <MESSAGE value="- Opções para efeitos marginais no probit/logit" />
     <MESSAGE value="Melhores comentários (Poisson, Hausman)" />
     <MESSAGE value="Melhor documentação da fórmula de efeitos fixos." />
-    <option name="LAST_COMMIT_MESSAGE" value="Melhor documentação da fórmula de efeitos fixos." />
+    <MESSAGE value="Adição da análise de linguagem natural dos discursos da CPI (Wordcloud)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adição da análise de linguagem natural dos discursos da CPI (Wordcloud)" />
   </component>
 </project>

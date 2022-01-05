@@ -474,7 +474,7 @@ def fixed_effects(panel_data, formula, weights=None, time_effects=False, cov="un
     :param weights : N x 1 Series or vector containing weights to be used in estimation; defaults to None
         Use is recommended when analyzing survey data, passing on the weight available in the survey
     :param time_effects : bool, defaults to False
-        Whether to include time effects alongside entity effects (and estimate a 2WFE)
+        Whether to include time effects alongside entity effects (and estimate a two-way fixed effects)
     :param cov : str
         unadjusted: common standard errors
         robust: robust standard errors

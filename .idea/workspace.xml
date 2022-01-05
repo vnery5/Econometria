@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="Adição de gráfico de barras e melhores comentários na análise dos discursos da CPI">
-      <change afterPath="$PROJECT_DIR$/Notebooks/Linguagem Natural/Palavras_CPI.png" afterDir="false" />
+    <list default="true" id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="Gráfico com tema escuro (print PyCharm)">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Notebooks/Linguagem Natural/WordCloud CPI.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Notebooks/Linguagem Natural/WordCloud CPI.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/econometric_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/econometric_functions.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,7 +61,7 @@
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="reference.settings.ide.settings.spelling" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunManager">
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
@@ -129,7 +129,10 @@
       <workItem from="1640210732657" duration="308000" />
       <workItem from="1640214192755" duration="2340000" />
       <workItem from="1640269372771" duration="436000" />
-      <workItem from="1640271754329" duration="1229000" />
+      <workItem from="1640271754329" duration="1447000" />
+      <workItem from="1641402345235" duration="520000" />
+      <workItem from="1641403054203" duration="1159000" />
+      <workItem from="1641408803827" duration="402000" />
     </task>
     <task id="LOCAL-00001" summary="Better code formatting.">
       <created>1632607000801</created>
@@ -292,7 +295,14 @@
       <option name="project" value="LOCAL" />
       <updated>1640272981214</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="Gráfico com tema escuro (print PyCharm)">
+      <created>1640273206700</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1640273206700</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -333,6 +343,7 @@
     <MESSAGE value="Melhor documentação da fórmula de efeitos fixos." />
     <MESSAGE value="Adição da análise de linguagem natural dos discursos da CPI (Wordcloud)" />
     <MESSAGE value="Adição de gráfico de barras e melhores comentários na análise dos discursos da CPI" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adição de gráfico de barras e melhores comentários na análise dos discursos da CPI" />
+    <MESSAGE value="Gráfico com tema escuro (print PyCharm)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Gráfico com tema escuro (print PyCharm)" />
   </component>
 </project>

@@ -4,10 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="Gráfico com tema escuro (print PyCharm)">
+    <list default="true" id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="Atualização de pacotes">
+      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Econometria.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Econometria.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Notebooks/Linguagem Natural/WordCloud CPI.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Notebooks/Linguagem Natural/WordCloud CPI.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/econometric_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/econometric_functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Notebooks/Séries de Tempo/Projecao via autoARIMA v1.3.xlsm" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -132,7 +135,9 @@
       <workItem from="1640271754329" duration="1447000" />
       <workItem from="1641402345235" duration="520000" />
       <workItem from="1641403054203" duration="1159000" />
-      <workItem from="1641408803827" duration="402000" />
+      <workItem from="1641408803827" duration="781000" />
+      <workItem from="1641410128826" duration="38000" />
+      <workItem from="1644337354091" duration="261000" />
     </task>
     <task id="LOCAL-00001" summary="Better code formatting.">
       <created>1632607000801</created>
@@ -302,7 +307,14 @@
       <option name="project" value="LOCAL" />
       <updated>1640273206700</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="Atualização de pacotes">
+      <created>1641409574181</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1641409574181</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -344,6 +356,7 @@
     <MESSAGE value="Adição da análise de linguagem natural dos discursos da CPI (Wordcloud)" />
     <MESSAGE value="Adição de gráfico de barras e melhores comentários na análise dos discursos da CPI" />
     <MESSAGE value="Gráfico com tema escuro (print PyCharm)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Gráfico com tema escuro (print PyCharm)" />
+    <MESSAGE value="Atualização de pacotes" />
+    <option name="LAST_COMMIT_MESSAGE" value="Atualização de pacotes" />
   </component>
 </project>

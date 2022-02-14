@@ -1076,16 +1076,15 @@ but have not yet been generalized to functions. Go check the notebooks in Notebo
 
 def t_test_variables(dfDataPreTreatment, sColumnTreated, lVariables=None):
     """
-    Loops through the columns in lVariables and performs t-test of means in order to see if
-    treatment and control group are similar PRE-treatment. Ideally, they are only different in the outcome variable.
-    If all/most of the test are insignificant, randomization was done properlly and
-    OLS can be used to assess the program's results.
+    Loops through the columns in lVariables and performs t-test of means in order to see if treatment and control groups 
+    are similar PRE-treatment. Ideally, they are only different in the outcome variable. If all/most of the test are 
+    insignificant, randomization was done properlly and OLS can be used to assess the program's results.
 
     :param dfDataPreTreatment: DataFrame containing all observations pre-treatment;
     :param sColumnTreated: string that identifies the 1/0 column that determines if an individual is treated or not;
     :param lVariables: list of variables to test. If None, does all column in dfDataPreTreatment
-
     """
+
     ## Counting ratio of treated and controls in respect to total
     print(dfDataPreTreatment[sColumnTreated].value_counts(normalize=True))
 
@@ -1093,8 +1092,11 @@ def t_test_variables(dfDataPreTreatment, sColumnTreated, lVariables=None):
     dfTreatment = dfDataPreTreatment.query(f'{sColumnTreated} == 1')
     dfControl = dfDataPreTreatment.query(f'{sColumnTreated} == 0')
 
-    ## Looping
+    ## Looping through each column and testing
+    # Checking to see if lVariables was passed
     lVariables = lVariables if lVariables is not None else list(dfDataPreTreatment.columns)
+
+    # Looping
     for sVariable in lVariables:
         ## Test
         tuplaTeste = stats.ttest_ind(dfTreatment[sVariable], dfControl[sVariable], nan_policy='omit')
@@ -1108,10 +1110,10 @@ def t_test_variables(dfDataPreTreatment, sColumnTreated, lVariables=None):
 
         ## Printing
         print(f"\n========================= {sVariable}{sAsterisco} =========================")
-        print(f"Média Tratamento: {np.around(nMeanTreated, 2)}")
-        print(f"Média Comparação: {np.around(nMeanControl, 2)}")
-        print(f"Diferença = {np.around(nMeanTreated - nMeanControl, 2)}")
-        print(f"Estatística = {np.around(tuplaTeste[0], 4)} \t P-valor = {np.around(tuplaTeste[1], 4)}")
+        print(f"Média Tratamento: {np.around(nMeanTreated, 3)}")
+        print(f"Média Comparação: {np.around(nMeanControl, 3)}")
+        print(f"Diferença = {np.around(nMeanTreated - nMeanControl, 3)}")
+        print(f"Estatística = {np.around(tuplaTeste[0], 5)} \t P-valor = {np.around(tuplaTeste[1], 5)}")
 
 
 def normalize(dfData, sColumnNormalization, sColumnToBeNormalized):

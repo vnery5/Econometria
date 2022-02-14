@@ -5,7 +5,9 @@ Há uma série de exemplos na pasta *Notebooks*, contendo aplicações de regres
 
 As funções estão reunidas no arquivo **`econometric_functions.py`**. Para usá-las, basta colocar o arquivo no mesmo diretório da sua aplicação e importar como um módulo normal:
 
-`import econometric_functions as ef`
+```
+import econometric_functions as ef
+```
 
 Caso queira deixar o arquivo em uma pasta separada, coloque o caminho da pasta abaixo e rode esse código:
 

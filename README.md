@@ -3,7 +3,23 @@
 A intenção desse GitHub é unificar, simplificar e deixar claro as funções relativas à econometria no Python, usando principalmente o `statsmodels`, o `linearmodels` e o `scipy`.
 Há uma série de exemplos na pasta *Notebooks*, contendo aplicações de regressões e testes, MQ2E, modelos de painel, séries temporais, avaliações de políticas públicas e modelos de crescimento econômico.
 
-As funções estão reunidas no arquivo **`econometric_functions.py`**. As principais funcionalidades estão descritas abaixo:
+As funções estão reunidas no arquivo **`econometric_functions.py`**. Para usá-las, basta colocar o arquivo no mesmo diretório da sua aplicação e importar como um módulo normal:
+
+`import econometric_functions as ef`
+
+Caso queira deixar o arquivo em uma pasta separada, coloque o caminho da pasta abaixo e rode esse código:
+
+```
+import os
+import sys
+
+sCaminhoEconometria = "caminho_da_pasta"
+sys.path.append(os.path.abspath(sCaminhoEconometria))
+
+import econometric_functions as ef
+```
+
+As principais funcionalidades estão descritas abaixo:
 
 ----
 

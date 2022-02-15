@@ -83,11 +83,3 @@ Parte do conteúdo, feito para uma disciplina da faculdade IDP, foi adaptado do 
 <p align="center">
 <img src="Prints/rdd.png" alt="Regressão Discontínua" width="500"/>
 </p>
-
-----
-
-## Outros
-
-A intenção do repositório é abrigar outros pequenos projetos pessoais, como:
-
-- [Análise dos discursos das CPIs](https://github.com/vnery5/Econometria/tree/main/Notebooks/Linguagem%20Natural) para analisar os temas mais frequentes tratados na comissão parlamentar.

@@ -629,7 +629,7 @@ def iv_2sls(data, formula, weights=None, cov="robust", clusters=None):
 
 
 ####################################### Discrete Dependent Variables and Selection Bias #########################
-## Other implementations: http://www.upfie.net/downloads17.html
+## Tobit implementation: http://www.upfie.net/downloads17.html
 
 def probit_logit(formula, data, model=probit, subset=None, cov='normal', marg_effects='overall'):
     """
@@ -739,6 +739,42 @@ def poisson_reg(formula, data, subset=None, cov='normal'):
     print("or a K x N Dimensional array, where K = number of variables and N = number of observations.")
 
     return mod
+
+
+def heckit(formula_probit, formula_model, data, subset_model, cov='normal'):
+    """
+    Performs the Heckit procedure for sample selection correction.
+    The procedure is done through (1) a probit estimation for the selection variable using all available 
+    data and (2) a OLS regression using the 'selected' data and a formula containing the Inverse Mills Ratio (λ).
+    Remember to use modHeckit = heckit(...)!
+
+    :param formula_probit: patsy/R formula for the probit model on the selection variable;
+    :param formula_model: patsy/R formula for the model on the 'selected' data;
+    :param data: dataframe containing the data
+    :param subset_model: only use a subset of the data? Defaults to None (all data)
+        Must be in the form of `subset=(df['subset_column'] == 1)`.
+    :param cov : str
+        unadjusted: common standard errors
+        robust: HC1 standard errors
+        cluster or clustered: clustered standard errors (must specify group)
+    :return : statsmodels model instance
+    """
+
+    ## Fitting the probit model
+    mod_probit = probit(formula_probit, data).fit()
+
+    ## Calculating predicted values
+    predicted_values = mod_probit.fittedvalues
+
+    ## Calculating λ and adding as a column to the DataFrame
+    df['inv_mills'] = stats.norm.pdf(predicted_values) / stats.norm.cdf(predicted_values)
+
+    ## Appending inv_mills to formula_model
+    formula_model += ' + inv_mills'
+
+    ## Fitting the ols_model
+    mod_heckit = ols_reg(formula_model, data, subset_model, cov)
+    return mod_heckit
 
 
 ####################################### Time Series #########################

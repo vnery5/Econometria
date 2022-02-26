@@ -4,13 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="Atualização de pacotes">
-      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/Econometria.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Econometria.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="Adição de subsets">
+      <change afterPath="$PROJECT_DIR$/Notebooks/Tobit_Heckman.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Notebooks/Linguagem Natural/WordCloud CPI.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Notebooks/Linguagem Natural/WordCloud CPI.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Notebooks/Séries de Tempo/Projecao via autoARIMA v1.3.xlsm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Notebooks/Exemplos Wooldridge/Icon&#10;" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Notebooks/Exemplos Wooldridge/Lista 7 Econometria - Cap 17 Wooldridge (Probit, Logit, Poisson, Tobit, Heckman).ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Notebooks/Exemplos Wooldridge/econometric_functions_example.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Notebooks/Exemplos Wooldridge/Poisson_Probit_Logit.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Notebooks/Exemplos Wooldridge/funcoes_econometria.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Notebooks/Icon&#10;" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,6 +22,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Python Script" />
+        <option value="Jupyter Notebook" />
       </list>
     </option>
   </component>
@@ -138,6 +140,8 @@
       <workItem from="1641408803827" duration="781000" />
       <workItem from="1641410128826" duration="38000" />
       <workItem from="1644337354091" duration="261000" />
+      <workItem from="1645888979985" duration="1945000" />
+      <workItem from="1645890951740" duration="38000" />
     </task>
     <task id="LOCAL-00001" summary="Better code formatting.">
       <created>1632607000801</created>
@@ -314,7 +318,14 @@
       <option name="project" value="LOCAL" />
       <updated>1641409574181</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="Adição de subsets">
+      <created>1645890716334</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1645890716334</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -332,7 +343,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Better code formatting." />
     <MESSAGE value="Removed notebooks folder (now they are in the main directory) and added some panel examples from Wooldridge's book." />
     <MESSAGE value="Lots of changes:&#10;&#10;- Added weights option in panel and IV2LS models&#10;- Fixed print identation&#10;- Corrected typos" />
     <MESSAGE value="Added OLS Diagnostics and Cooks Distance for high leverage/outlier data points." />
@@ -357,6 +367,7 @@
     <MESSAGE value="Adição de gráfico de barras e melhores comentários na análise dos discursos da CPI" />
     <MESSAGE value="Gráfico com tema escuro (print PyCharm)" />
     <MESSAGE value="Atualização de pacotes" />
-    <option name="LAST_COMMIT_MESSAGE" value="Atualização de pacotes" />
+    <MESSAGE value="Adição de subsets" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adição de subsets" />
   </component>
 </project>

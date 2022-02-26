@@ -54,6 +54,8 @@ Além disso, há a implementação de **MQ2E** para Variáveis Instrumentais. To
 
 Implementação de `probit`, `logit` e `poisson`, printando os efeitos marginais e alguns outros comandos interessantes para análises.
 
+Além disso, há uma implementação do modelo `heckit` para a correção de seleção amostral. Uma implementação do modelo `Tobit` para dados truncados pode ser vista [aqui](http://www.upfie.net/downloads17.html).
+
 ----
 
 ## Séries Temporais

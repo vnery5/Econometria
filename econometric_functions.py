@@ -50,7 +50,7 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 ####################################### Functions ###############################################################
 ####################################### Continuous Dependent Variables ##########################################
-def ols_reg(formula, data, cov='unadjusted'):
+def ols_reg(formula, data, subset=None, cov='unadjusted'):
     """
     Fits a standard OLS model with the corresponding covariance matrix using an R-style formula (y ~ x1 + x2...).
     To compute without an intercept, use -1 or 0 in the formula.
@@ -58,6 +58,8 @@ def ols_reg(formula, data, cov='unadjusted'):
     For generalized and weighted estimation, see statsmodels documentation or the first version of this file.
     :param formula: patsy formula (R style)
     :param data: dataframe containing the data
+    :param subset: only use a subset of the data? Defaults to None (all data)
+        Must be in the form of `subset=(df['subset_column'] == 1)`.
     :param cov : str
         unadjusted: common standard errors
         robust: HC1 standard errors
@@ -67,16 +69,16 @@ def ols_reg(formula, data, cov='unadjusted'):
 
     # Creating and fitting the model
     if cov == "robust":
-        mod = ols(formula, data).fit(use_t=True, cov_type='HC1')
+        mod = ols(formula, data, subset).fit(use_t=True, cov_type='HC1')
     elif cov == "cluster" or cov == "clustered":
         group = str(input("Which column is the group?"))
         try:
-            mod = ols(formula, data).fit(use_t=True, cov_type='cluster', cov_kwds={'groups': data[group]})
+            mod = ols(formula, data, subset).fit(use_t=True, cov_type='cluster', cov_kwds={'groups': data[group]})
         except KeyError:
             erro = "It was not possible to find the selected group. Check the spelling and try again!"
             return erro
     else:
-        mod = ols(formula, data).fit(use_t=True)
+        mod = ols(formula, data, subset).fit(use_t=True)
 
     ## Printing the summary and returning the object
     print(mod.summary())
@@ -627,10 +629,9 @@ def iv_2sls(data, formula, weights=None, cov="robust", clusters=None):
 
 
 ####################################### Discrete Dependent Variables and Selection Bias #########################
-## MISSING: Heckit, Tobit and discontinuous/censored regressions
-## Heckman procedures for sample correction can be imported from the Heckman.py file (unreleased version of statsmodels)
+## Other implementations: http://www.upfie.net/downloads17.html
 
-def probit_logit(formula, data, model=probit, cov='normal', marg_effects='overall'):
+def probit_logit(formula, data, model=probit, subset=None, cov='normal', marg_effects='overall'):
     """
     Creates a probit/logit model and returns its summary and average parcial effects (get_margeff).
     Documentation: https://www.statsmodels.org/stable/examples/notebooks/generated/discrete_choice_example.html
@@ -639,26 +640,29 @@ def probit_logit(formula, data, model=probit, cov='normal', marg_effects='overal
     :param formula: patsy formula
     :param data: dataframe
     :param model: probit or logit. Defaults to probit.
+    :param subset: only use a subset of the data? Defaults to None (all data)
+        Must be in the form of `subset=(df['subset_column'] == 1)`.
     :param cov : str
         normal: common standard errors
         robust: HC1 standard errors
         cluster or clustered: clustered standard errors (must specify group)
-    :param marg_effects : str, either 'overall' (APE), 'mean' (PEA) or 'zero'. Defaults to 'overall' (APE).
+    :param marg_effects : str, either 'overall' (Average Partial Effects - APE), 'mean' (Partial Effects at the Average
+    - PEA) or 'zero'. Defaults to 'overall' (APE).
     :return : statsmodels model instance
     """
 
     # Creating and fitting the model
     if cov == "robust":
-        mod = model(formula, data).fit(use_t=True, cov_type='HC1')
+        mod = model(formula, data, subset).fit(use_t=True, cov_type='HC1')
     elif cov == "cluster" or cov == "clustered":
         group = str(input("What is the group column?"))
         try:
-            mod = model(formula, data).fit(use_t=True, cov_type='cluster', cov_kwds={'groups': data[group]})
+            mod = model(formula, data, subset).fit(use_t=True, cov_type='cluster', cov_kwds={'groups': data[group]})
         except KeyError:
             erro = "It was not possible to find the desired group. Check the spelling and the data and try again!"
             return erro
     else:
-        mod = model(formula, data).fit(use_t=True)
+        mod = model(formula, data, subset).fit(use_t=True)
 
     ## Capturing the marginal effects
     mfx = mod.get_margeff(at=marg_effects)
@@ -679,7 +683,7 @@ def probit_logit(formula, data, model=probit, cov='normal', marg_effects='overal
     return mod
 
 
-def poisson_reg(formula, data, cov='normal'):
+def poisson_reg(formula, data, subset=None, cov='normal'):
     """
     Creates a poisson model (counting y variable) and returns its summary and average parcial effects (get_margeff).
     Documentation: https://www.statsmodels.org/stable/examples/notebooks/generated/discrete_choice_example.html
@@ -687,6 +691,8 @@ def poisson_reg(formula, data, cov='normal'):
 
     :param formula: patsy formula
     :param data: dataframe
+    :param subset: only use a subset of the data? Defaults to None (all data)
+        Must be in the form of `subset=(df['subset_column'] == 1)`.
     :param cov: str
         normal: common standard errors
         robust: HC1 standard errors
@@ -696,16 +702,16 @@ def poisson_reg(formula, data, cov='normal'):
 
     # Creating and fitting the model
     if cov == "robust":
-        mod = poisson(formula, data).fit(use_t=True, cov_type='HC1')
+        mod = poisson(formula, data, subset).fit(use_t=True, cov_type='HC1')
     elif cov == "cluster" or cov == "clustered":
         group = str(input("What is the group column?"))
         try:
-            mod = poisson(formula, data).fit(use_t=True, cov_type='cluster', cov_kwds={'groups': data[group]})
+            mod = poisson(formula, data, subset).fit(use_t=True, cov_type='cluster', cov_kwds={'groups': data[group]})
         except KeyError:
             erro = "It was not possible to find the desired group. Check the spelling and the data and try again!"
             return erro
     else:
-        mod = poisson(formula, data).fit(use_t=True)
+        mod = poisson(formula, data, subset).fit(use_t=True)
 
     ## Calculating under/overdispersion
     sigma = np.around((sum(mod.resid ** 2 / mod.predict()) / mod.df_resid) ** (1 / 2), 2)
@@ -717,7 +723,7 @@ def poisson_reg(formula, data, cov='normal'):
     print(mod.summary())
     print(
         f"The coefficient to determine over/underdispersion is σ = {sigma}, " +
-        f"which must be close to one for standard errors to be valid. " +
+        f"which must be close to 1 for standard errors to be valid. " +
         f"If not, they must be multiplied by {sigma}.")
 
     print("##############################################################################")

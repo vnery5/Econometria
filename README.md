@@ -9,7 +9,7 @@ As funções estão reunidas no arquivo **`econometric_functions.py`**. Para us�
 import econometric_functions as ef
 ```
 
-Caso queira deixar o arquivo em uma pasta separada, coloque o caminho da pasta abaixo e rode esse código:
+Caso queira deixar o arquivo em uma pasta separada, coloque o caminho da pasta abaixo e rode esse código no início do seu notebook:
 
 ```
 import os
@@ -27,11 +27,12 @@ As principais funcionalidades estão descritas abaixo:
 
 ## Regressões e Testes
 
-- `ols_reg`: Executa uma regressão MQO a partir de uma formula, mas com opções mais fáceis para a matriz de covariância (robusta e clusterizada).
-- `f_test`: Realiza um teste F de significância conjunta de várias variáveis. Consequentemente, é capaz de realizar um teste t de significância simples ou igualdade de coeficientes.
-- `ols_diagnostics`: Talvez uma das maiores contribuições do diretório; é similar ao `plot(modelo)` do R, plottando gráficos e realizando testes que verificam todas as hipóteses do modelo linear clássico (Gauss-Markov).
+- `ols_reg()`: Executa uma regressão MQO a partir de uma formula, mas com opções mais fáceis para a matriz de covariância (robusta e clusterizada).
+- `f_test()`: Realiza um teste F de significância conjunta de várias variáveis. Consequentemente, é capaz de realizar um teste t de significância simples ou igualdade de coeficientes.
+- `ols_diagnostics()`: Talvez uma das maiores contribuições do diretório; é similar ao `plot(modelo)` do R, plottando gráficos e realizando testes que verificam todas as hipóteses do modelo linear clássico (Gauss-Markov).
 
-Nesse sentido, `cooks_distance_outlier_influence` ajuda a averiguar a existência de outliers e observações com alta alavancagem, que poderiam ter muita influência sobre os coeficientes estimados para a regressão.
+Nesse sentido, `cooks_distance_outlier_influence()` ajuda a averiguar a existência de outliers e observações com alta alavancagem, que poderiam ter muita influência sobre os coeficientes estimados para a regressão.
+Um exemplo do `ols_diagnostics()` pode ser visto abaixo:
 
 <p align="center">
 <img src="Prints/diagnostics.png" alt="Diagnósticos MQO" width="500"/>
@@ -39,10 +40,10 @@ Nesse sentido, `cooks_distance_outlier_influence` ajuda a averiguar a existênci
 
 ----
 
-## Modelos de Painel
+## Modelos de Painel e Variáveis Instrumentais
 
-- `xtdescribe_panel`: Similar ao comando do STATA, verifica o grau de balanceamento do painel, ou seja, conta a distribuição do número de aparecimentos dos indivíduos no *dataset*.
-- `panel_structure`: Cria um DataFrame com um MultiIndex de indivíduo-tempo, necessário para os modelos de painel.
+- `xtdescribe_panel()`: Similar ao comando do STATA, verifica o grau de balanceamento do painel, ou seja, conta a distribuição do número de aparecimentos dos indivíduos no *dataset*.
+- `panel_structure()`: Cria um DataFrame com um MultiIndex de indivíduo-tempo, necessário para os modelos de painel.
 
 Há todos os modelos de painel presentes no livro *Introdução a Econometria: uma abordagem moderna* (**MQO Agrupado, Efeitos Fixos e Efeitos Aleatórios**), além de uma implementação do **Teste de Hausman**.
 
@@ -50,11 +51,11 @@ Além disso, há a implementação de **MQ2E** para Variáveis Instrumentais. To
 
 ----
 
-## Modelos Binários e de Contagem
+## Modelos Binários, de Contagem e de Seleção Amostral
 
-Implementação de `probit`, `logit` e `poisson`, printando os efeitos marginais e alguns outros comandos interessantes para análises.
+Implementação de `probit()`, `logit()` e `poisson()`, printando os efeitos marginais e alguns outros comandos interessantes para análises.
 
-Além disso, há uma implementação do modelo `heckit` para a correção de seleção amostral. Uma implementação do modelo `Tobit` para dados truncados pode ser vista [aqui](http://www.upfie.net/downloads17.html).
+Além disso, há uma implementação do modelo `heckit()` para a correção de seleção amostral. Uma implementação do modelo `Tobit` para dados truncados pode ser vista [aqui](http://www.upfie.net/downloads17.html).
 
 ----
 

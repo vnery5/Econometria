@@ -4,13 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="Adição de subsets">
-      <change afterPath="$PROJECT_DIR$/Notebooks/Tobit_Heckman.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="985ae60e-ba96-4651-a2cf-2a72c367537a" name="Changes" comment="Reorganização">
       <change beforePath="$PROJECT_DIR$/Notebooks/Exemplos Wooldridge/Icon&#10;" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Notebooks/Exemplos Wooldridge/Lista 7 Econometria - Cap 17 Wooldridge (Probit, Logit, Poisson, Tobit, Heckman).ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Notebooks/Exemplos Wooldridge/econometric_functions_example.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Notebooks/Exemplos Wooldridge/Poisson_Probit_Logit.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Notebooks/Exemplos Wooldridge/funcoes_econometria.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Notebooks/Icon&#10;" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -142,6 +137,7 @@
       <workItem from="1644337354091" duration="261000" />
       <workItem from="1645888979985" duration="1945000" />
       <workItem from="1645890951740" duration="38000" />
+      <workItem from="1645892620548" duration="239000" />
     </task>
     <task id="LOCAL-00001" summary="Better code formatting.">
       <created>1632607000801</created>
@@ -325,7 +321,28 @@
       <option name="project" value="LOCAL" />
       <updated>1645890716334</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="Adição de Heckit!">
+      <created>1645892795515</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1645892795515</updated>
+    </task>
+    <task id="LOCAL-00028" summary="Reorganização">
+      <created>1645892813049</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1645892813049</updated>
+    </task>
+    <task id="LOCAL-00029" summary="Reorganização">
+      <created>1645892830054</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1645892830054</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -343,8 +360,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Removed notebooks folder (now they are in the main directory) and added some panel examples from Wooldridge's book." />
-    <MESSAGE value="Lots of changes:&#10;&#10;- Added weights option in panel and IV2LS models&#10;- Fixed print identation&#10;- Corrected typos" />
     <MESSAGE value="Added OLS Diagnostics and Cooks Distance for high leverage/outlier data points." />
     <MESSAGE value="Organização de Pastas" />
     <MESSAGE value="- Added Durbin-Watson Test in ols_diagnostics()&#10;- IV2SLS now has robust standard errors by default&#10;- Reminded users (in docstrings) to explicitly include an intercept when working with linearmodels functions (panel and IV models)" />
@@ -368,6 +383,8 @@
     <MESSAGE value="Gráfico com tema escuro (print PyCharm)" />
     <MESSAGE value="Atualização de pacotes" />
     <MESSAGE value="Adição de subsets" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adição de subsets" />
+    <MESSAGE value="Adição de Heckit!" />
+    <MESSAGE value="Reorganização" />
+    <option name="LAST_COMMIT_MESSAGE" value="Reorganização" />
   </component>
 </project>

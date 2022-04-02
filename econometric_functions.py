@@ -50,12 +50,14 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 ####################################### Functions ###############################################################
 ####################################### Continuous Dependent Variables ##########################################
-def ols_reg(formula, data, subset=None, cov='unadjusted'):
+def ols_reg(formula, data, subset=None, cov='robust'):
     """
     Fits a standard OLS model with the corresponding covariance matrix using an R-style formula (y ~ x1 + x2...).
     To compute without an intercept, use -1 or 0 in the formula.
     Remember to use mod = ols_reg(...).
+
     For generalized and weighted estimation, see statsmodels documentation or the first version of this file.
+
     :param formula: patsy formula (R style)
     :param data: dataframe containing the data
     :param subset: only use a subset of the data? Defaults to None (all data)
@@ -361,6 +363,12 @@ def cooks_distance_outlier_influence(model):
 
 
 ####################################### Panel Models (linearmodels) #############################################
+
+"""
+Panel models are generally used with time-period dummies in order to correct endogeneity problems that arise 
+from unobserved omitted variables that are fixed in time and are correlated with our regressors.
+"""
+
 def xtdescribe_panel(data, entity_column):
     """
     Calculates the total appearances for each individual and checks how balanced the panel dataset is.
@@ -383,7 +391,7 @@ def xtdescribe_panel(data, entity_column):
 
 def panel_structure(data, entity_column, time_column):
     """
-    Takes a dataframe and creates a panel structure.
+    Takes a dataframe and creates a panel MultiIndex structure, which is necessary for linearmodels estimations.
 
     :param data : dataframe
     :param entity_column : str, column that represents the individuals (1st level index)
@@ -398,14 +406,16 @@ def panel_structure(data, entity_column, time_column):
         data = data.set_index([entity_column, time_column])
         data[time_column] = time  # creating a column with the time values (makes it easier to access it later)
         return data
+        
     except KeyError:
         print("One of the columns is not in the dataframe. Please try again!")
         return None
 
 
-def pooled_ols(panel_data, formula, weights=None, cov="unadjusted"):
+def pooled_ols(panel_data, formula, weights=None, cov="kernel"):
     """
     Fits a standard Pooled OLS model with the corresponding covariance matrix.
+    Like random effects, it assumes that the unobserved effects aren't correlated with the error term.
     Remember to include an intercept in the formula ('y ~ 1 + x1 + ...') and to assign it to an object!
 
     :param panel_data : dataframe (which must be in a panel structure)
@@ -415,7 +425,7 @@ def pooled_ols(panel_data, formula, weights=None, cov="unadjusted"):
     :param cov : str
         unadjusted: common standard errors
         robust: robust standard errors
-        kernel: robust to heteroskedacity AND serial autocorrelation
+        kernel: robust to heteroskedacity AND serial autocorrelation (HAC)
         clustered: clustered standard errors by the entity column
     :return : linearmodels model instance
     """
@@ -434,10 +444,13 @@ def pooled_ols(panel_data, formula, weights=None, cov="unadjusted"):
     return mod
 
 
-def first_difference(panel_data, formula, weights=None, cov="unadjusted"):
+def first_difference(panel_data, formula, weights=None, cov="kernel"):
     """
     Fits a standard FD model with the corresponding covariance matrix and WITHOUT an intercept.
     Remember to assign it to an object!
+
+    Usually, it is preferred to FE when the error is a random walk, i.e., when past errors
+    are translated into future periods (high serial autocorrelation).
 
     :param panel_data : dataframe (which must be in a panel structure)
     :param formula : patsy formula
@@ -446,7 +459,7 @@ def first_difference(panel_data, formula, weights=None, cov="unadjusted"):
     :param cov : str
         unadjusted: common standard errors
         robust: robust standard errors
-        kernel: robust to heteroskedacity AND serial autocorrelation
+        kernel: robust to heteroskedacity AND serial autocorrelation (HAC)
         clustered: clustered standard errors by the entity column
     :return : linearmodels model instance
     """
@@ -463,13 +476,16 @@ def first_difference(panel_data, formula, weights=None, cov="unadjusted"):
     return mod
 
 
-def fixed_effects(panel_data, formula, weights=None, time_effects=False, cov="unadjusted"):
+def fixed_effects(panel_data, formula, weights=None, time_effects=False, cov="kernel"):
     """
     Fits a standard Fixed Effects model with the corresponding covariance matrix.
-    It can be estimated WITH and WITHOUT a constant.
-    It is preferred when the unobserved effects are correlated with the error term
-    and, therefore, CAN'T estimate constant terms.
-    Remember to include an intercept in the formula ('y ~ 1 + x1 + ...') and to assign it to an object!
+    It can be estimated WITH (use 'y ~ 1 + ... ') and WITHOUT a constant.
+
+    It is preferred when the unobserved effects are correlated with the error term and, therefore, 
+    CAN'T estimate constant terms.
+
+    Usually, it is preferred to FD when the short-term variations are small and the error doesn't follow
+    a random walk, i.e., when there is no or little serial autocorrelation.
 
     :param panel_data : dataframe (which must be in a panel structure)
     :param formula : patsy/R formula (without EntityEffects, will be added inside the function)
@@ -480,7 +496,7 @@ def fixed_effects(panel_data, formula, weights=None, time_effects=False, cov="un
     :param cov : str
         unadjusted: common standard errors
         robust: robust standard errors
-        kernel: robust to heteroskedacity AND serial autocorrelation
+        kernel: robust to heteroskedacity AND serial autocorrelation (HAC)
         clustered: clustered standard errors by the entity column
     :return : linearmodels model instance
     """
@@ -502,13 +518,13 @@ def fixed_effects(panel_data, formula, weights=None, time_effects=False, cov="un
     return mod
 
 
-def random_effects(panel_data, formula, weights=None, cov="unadjusted"):
+def random_effects(panel_data, formula, weights=None, cov="kernel"):
     """
     Fits a standard Random Effects model with the corresponding covariance matrix.
-    It can be estimated WITH and WITHOUT a constant.
+    It can be estimated WITH (use 'y ~ 1 + ... ') and WITHOUT a constant.
+
     It is preferred when the unobserved effects aren't correlated with the error term
-    and, therefore, CAN estimate constant terms.
-    Remember to include an intercept in the formula ('y ~ 1 + x1 + ...') and to assign it to an object!
+    and, therefore, CAN estimate constant terms and is more efficient than FE in that case.
 
     :param panel_data : dataframe (which must be in a panel structure)
     :param formula : patsy formula
@@ -517,7 +533,7 @@ def random_effects(panel_data, formula, weights=None, cov="unadjusted"):
     :param cov : str
         unadjusted: common standard errors
         robust: robust standard errors
-        kernel: robust to heteroskedacity AND serial autocorrelation
+        kernel: robust to heteroskedacity AND serial autocorrelation (HAC)
         clustered: clustered standard errors by the entity column
     :return : linearmodels model instance
     """
@@ -535,7 +551,7 @@ def random_effects(panel_data, formula, weights=None, cov="unadjusted"):
     return mod
 
 
-def hausman_fe_re(panel_data, inef_formula, weights=None, cov="unadjusted", level=0.05):
+def hausman_fe_re(panel_data, inef_formula, weights=None, cov="kernel", level=0.05):
     """
     Executes a Hausman test, which H0: there is no correlation between unobserved effects and the independent variables
     It is not necessary to assign the function to an object! But remember to include an intercept in the formulas.
@@ -547,7 +563,7 @@ def hausman_fe_re(panel_data, inef_formula, weights=None, cov="unadjusted", leve
     :param cov : str
         unadjusted: common standard errors
         robust: robust standard errors
-        kernel: robust to heteroskedacity AND serial autocorrelation
+        kernel: robust to heteroskedacity AND serial autocorrelation (HAC)
     :param level : significance level for the test. Defaults to 5%.
     """
 
@@ -576,14 +592,14 @@ def hausman_fe_re(panel_data, inef_formula, weights=None, cov="unadjusted", leve
     freedom = random.params.size - 1
 
     # Calculating p-value using chi2 survival function (sf, 1 - cumulative distribution function)
-    p = stats.chi2(freedom).sf(H)
+    p = round(stats.chi2(freedom).sf(H), 6)
 
     if p < level:
         print(f"The value of H is {round(H, 6)} with {freedom} degrees of freedom in the chi-squared distribution.")
-        print(f"The p-value of the test is {round(p, 6)} and, therefore, H0 is REJECTED and fixed effects is preferred")
+        print(f"The p-value of the test is {p} and, therefore, H0 is REJECTED and FE is preferred (RE is biased).")
     else:
         print(f"The value of H is {round(H, 6)} with {freedom} degrees of freedom in the chi-squared distribution.")
-        print(f"The p-value of the test is {round(p, 6)} and H0 is NOT REJECTED and random effects is preferred.")
+        print(f"The test p-value is {p}; H0 is NOT REJECTED and RE is more efficient than FE (both aren't biased).")
 
 
 def iv_2sls(data, formula, weights=None, cov="robust", clusters=None):
@@ -599,7 +615,7 @@ def iv_2sls(data, formula, weights=None, cov="robust", clusters=None):
     :param cov : str
         unadjusted: common standard errors
         robust: robust standard errors
-        kernel: robust to heteroskedacity AND serial autocorrelation
+        kernel: robust to heteroskedacity AND serial autocorrelation (HAC)
         clustered: clustered standard errors by the entity column
     :param clusters : str or list containing names of the DataFrame variables to cluster by
         Only should be used when cov="clustered"
@@ -631,7 +647,7 @@ def iv_2sls(data, formula, weights=None, cov="robust", clusters=None):
 ####################################### Discrete Dependent Variables and Selection Bias #########################
 ## Tobit implementation: http://www.upfie.net/downloads17.html
 
-def probit_logit(formula, data, model=probit, subset=None, cov='normal', marg_effects='overall'):
+def probit_logit(formula, data, model=probit, subset=None, cov='robust', marg_effects='overall'):
     """
     Creates a probit/logit model and returns its summary and average parcial effects (get_margeff).
     Documentation: https://www.statsmodels.org/stable/examples/notebooks/generated/discrete_choice_example.html
@@ -683,7 +699,7 @@ def probit_logit(formula, data, model=probit, subset=None, cov='normal', marg_ef
     return mod
 
 
-def poisson_reg(formula, data, subset=None, cov='normal'):
+def poisson_reg(formula, data, subset=None, cov='robust'):
     """
     Creates a poisson model (counting y variable) and returns its summary and average parcial effects (get_margeff).
     Documentation: https://www.statsmodels.org/stable/examples/notebooks/generated/discrete_choice_example.html
@@ -741,7 +757,7 @@ def poisson_reg(formula, data, subset=None, cov='normal'):
     return mod
 
 
-def heckit(formula_probit, formula_model, data, subset_model, cov='normal'):
+def heckit(formula_probit, formula_model, data, subset_model, cov='robust'):
     """
     Performs the Heckit procedure for sample selection correction.
     The procedure is done through (1) a probit estimation for the selection variable using all available 

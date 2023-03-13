@@ -1,7 +1,7 @@
 """
 Functions that will do most of the basic econometric regressions, tests, panel models, IVs and Time Series applications.
 
-Author: Vinícius de Almeida Nery Ferreira (FACE/ECO - University of Brasília (UnB)).
+Author: Vinícius de Almeida Nery Ferreira.
 
 E-mail: vnery5@gmail.com
 
@@ -783,7 +783,7 @@ def heckit(formula_probit, formula_model, data, subset_model, cov='robust'):
     predicted_values = mod_probit.fittedvalues
 
     ## Calculating λ and adding as a column to the DataFrame
-    df['inv_mills'] = stats.norm.pdf(predicted_values) / stats.norm.cdf(predicted_values)
+    data['inv_mills'] = stats.norm.pdf(predicted_values) / stats.norm.cdf(predicted_values)
 
     ## Appending inv_mills to formula_model
     formula_model += ' + inv_mills'
@@ -932,8 +932,8 @@ def arima_model(vEndog, mExog=None, tPDQ=None):
     print(mod_arima.summary())
 
     print("For heteroskdasticity, check Prob(H), where H0: homoskedasticity, and the standardized residual graph.")
-    print("If there is hetero., the model error can't be a white noise (which is the desired thing).")
-    print("Estimaed Density and Jarque-Bera have information on normality.")
+    print("If there is heteroskdasticity, the model error can't be a white noise (which is the desired thing).")
+    print("Estimated Density and Jarque-Bera have information on normality.")
     print("In the correlogram, all lollipops must be inside of the shaded area.")
 
     # Plots
@@ -1128,7 +1128,7 @@ def prediction_accuracy(vPrediction, vTest):
 ####################################### Policy Evaluation (TO DO) #########################
 """
 Functions that will contain tools to evaluate policies. All methods have been implemented in their respective notebooks,
-but have not yet been generalized to functions. Go check the notebooks in Notebooks/Avaliação de Políticas!
+but have not yet been generalized to functions. Go check the notebooks in './Notebooks/Avaliação de Políticas'!
 """
 
 

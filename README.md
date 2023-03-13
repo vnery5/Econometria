@@ -86,3 +86,7 @@ Parte do conteúdo, feito para uma disciplina da faculdade IDP, foi adaptado do 
 <p align="center">
 <img src="Prints/rdd.png" alt="Regressão Discontínua" width="500"/>
 </p>
+
+----
+
+Além desse repositório, tenho um com projetos bem simples para aprender um pouco de Machine Learning e outros temas variados. Ele pode ser acessado [aqui](https://github.com/vnery5/Projetos).

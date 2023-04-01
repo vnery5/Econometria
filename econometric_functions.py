@@ -1157,7 +1157,8 @@ def t_test_variables(dfDataPreTreatment, sColumnTreated, lVariables=None):
     # Looping
     for sVariable in lVariables:
         ## Test
-        tuplaTeste = stats.ttest_ind(dfTreatment[sVariable], dfControl[sVariable], nan_policy='omit')
+        tuplaTeste = stats.ttest_ind(dfTreatment[sVariable], dfControl[sVariable], 
+                                     nan_policy='omit', alternative='two-sided')
 
         ## Checking to see if the difference is significant
         sAsterisco = "**" if tuplaTeste[1] < 0.05 else ""
@@ -1198,3 +1199,57 @@ def normalize(dfData, sColumnNormalization, sColumnToBeNormalized):
     ## Printing and returning
     print(dfData.head())
     return dfData
+
+def hypothesis_test(nSampleMean: float, nPopulationMean: float, 
+                    nVariance: float, nSampleSize: int,
+                    bKnownVariance=False, sType='two-sided', nSignificance=.05):
+    """
+    Does a hypothesis test of the sample mean in order to infer something about the population value.
+    Specifically, in the case of a two-sided test, it returns Pr(|t| > t_crit), 
+    where t_crit is the critical statistic.
+    In the case of a one sided test, it returns Pr(t > t_crit) or Pr(t < t_crit).
+
+    :param nSampleMean: sample mean;
+    :param nPopulationMean: population mean (hypothesis);
+    :param nVariance: variance of the population or sample;
+    :param nSampleSize: size of the sample;
+    :param bKnownVariance: boolean; do we know the population variance? Affects whether a T or Z-test is performed;
+    :param sType: string; bi or monocaudal test? If monocaudal, specify 'greater' or 'less';
+    :param nSignificance: significance level of the test;
+
+    :return Tuple containing the t-statistic and the p-value
+    """
+
+    # Bessel-correcting variance (if needed)
+    nVariance = nVariance if bKnownVariance else nVariance * (nSampleSize) / (nSampleSize - 1)
+
+    # Calculating t-statistic
+    t = (nSampleMean - nPopulationMean) / (nVariance / nSampleSize) ** (1 / 2)
+
+    # Calculating critical statistic and p-value
+    if bKnownVariance:
+        ## Values
+        t_crit = stats.norm.ppf(1 - nSignificance / 2)
+        p = 2*(1 - stats.norm.cdf(t_crit)) if sType == 'two-sided' else 1 - stats.norm.cdf(t_crit)
+
+        ## Adjusting for monocaudal cases
+        if (nSampleMean < nPopulationMean and sType == 'greater') or (nSampleMean > nPopulationMean and sType == 'less'):
+            p = 1 - p
+
+    else:
+        ## Values
+        nDF = nSampleSize - 1
+        t_crit = stats.t.ppf(1 - nSignificance / 2, df=nDF)
+        p = 2*(1 - stats.t.cdf(t_crit, df=nDF)) if sType == 'two-sided' else 1 - stats.t.cdf(t_crit, df=nDF)
+
+        ## Adjusting for monocaudal cases
+        if (nSampleMean < nPopulationMean and sType == 'greater') or (nSampleMean > nPopulationMean and sType == 'less'):
+            p = 1 - p
+
+    # Printing results
+    sResult = "H0 is rejected." if round(p, 3) <= nSignificance else "H0 can't be rejected."
+    print(f"The t-statistic is {round(t, 2)} (critical: {round(t_crit, 2)}).")
+    print(f"The p-value is {round(p, 3)} and, therefore, {sResult}")
+
+    # Returning
+    return (t, p)
